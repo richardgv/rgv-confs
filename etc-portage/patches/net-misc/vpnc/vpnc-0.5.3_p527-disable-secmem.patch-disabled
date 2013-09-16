@@ -1,0 +1,11 @@
+--- vpnc.c~	2013-03-10 23:01:50.000000000 +0800
++++ vpnc.c	2013-05-02 21:37:33.349845164 +0800
+@@ -3181,7 +3181,7 @@
+ 	gcry_control(GCRYCTL_SET_THREAD_CBS, &gcry_threads_pthread);
+ #endif
+ 	gcry_check_version("1.1.90");
+-	gcry_control(GCRYCTL_INIT_SECMEM, 16384, 0);
++	gcry_control(GCRYCTL_DISABLE_SECMEM);
+ 	group_init();
+ 
+ 	memset(s, 0, sizeof(*s));

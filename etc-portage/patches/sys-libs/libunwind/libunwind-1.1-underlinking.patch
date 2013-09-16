@@ -1,0 +1,11 @@
+--- tests/Makefile.am~	2012-10-06 12:54:38.000000000 +0800
++++ tests/Makefile.am	2012-10-28 21:07:06.141849025 +0800
+@@ -20,7 +20,7 @@
+ perf:
+ 
+ else
+- LIBUNWIND_local = $(top_builddir)/src/libunwind.la
++ LIBUNWIND_local = $(top_builddir)/src/libunwind.la $(LIBLZMA)
+ if ARCH_IA64
+  noinst_PROGRAMS_arch = ia64-test-dyn1
+  check_SCRIPTS_arch =	run-ia64-test-dyn1

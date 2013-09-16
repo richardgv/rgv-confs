@@ -1,0 +1,11 @@
+--- processwrapper.cc~	2013-09-16 21:03:31.929926309 +0800
++++ processwrapper.cc	2013-09-16 21:13:10.439918759 +0800
+@@ -93,6 +93,8 @@
+ }
+ 
+ #else
++#include <sys/types.h>
++#include <unistd.h>
+ 
+ unsigned int ProcessWrapper::currentProcessId()
+ {

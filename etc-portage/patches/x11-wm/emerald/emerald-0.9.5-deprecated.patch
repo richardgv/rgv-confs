@@ -1,0 +1,17 @@
+--- include/emerald.h~	2011-10-16 12:09:08.000000000 +0800
++++ include/emerald.h	2013-02-08 21:19:09.950028489 +0800
+@@ -12,14 +12,6 @@
+ #include <X11/cursorfont.h>
+ #include <X11/extensions/Xrender.h>
+ 
+-#ifndef GDK_DISABLE_DEPRECATED
+-#define GDK_DISABLE_DEPRECATED
+-#endif
+-
+-#ifndef GTK_DISABLE_DEPRECATED
+-#define GTK_DISABLE_DEPRECATED
+-#endif
+-
+ #include <gtk/gtk.h>
+ #include <gtk/gtkwindow.h>
+ #include <gdk/gdkx.h>

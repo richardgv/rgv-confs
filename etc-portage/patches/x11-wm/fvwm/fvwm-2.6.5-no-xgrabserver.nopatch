@@ -1,0 +1,63 @@
+--- fvwm/move_resize.c~	2013-03-22 17:15:34.940031037 +0800
++++ fvwm/move_resize.c	2013-03-22 17:15:38.020031042 +0800
+@@ -1234,13 +1234,13 @@
+ 			dpy, Scr.Root, exc->x.elast, &DragX, &DragY);
+ 	}
+ 
+-	MyXGrabServer(dpy);
++	// MyXGrabServer(dpy);
+ 	if (!XGetGeometry(
+ 		    dpy, w, &JunkRoot, &origDragX, &origDragY,
+ 		    (unsigned int*)&DragWidth, (unsigned int*)&DragHeight,
+ 		    (unsigned int*)&JunkBW, (unsigned int*)&JunkDepth))
+ 	{
+-		MyXUngrabServer(dpy);
++		// MyXUngrabServer(dpy);
+ 		return;
+ 	}
+ 	MyXGrabKeyboard(dpy);
+@@ -1271,7 +1271,7 @@
+ 	}
+ 	if (do_move_opaque)
+ 	{
+-		MyXUngrabServer(dpy);
++		// MyXUngrabServer(dpy);
+ 	}
+ 	else
+ 	{
+@@ -1311,7 +1311,7 @@
+ 		/* Throw away some events that dont interest us right now. */
+ 		discard_events(EnterWindowMask|LeaveWindowMask);
+ 		Scr.flags.is_wire_frame_displayed = False;
+-		MyXUngrabServer(dpy);
++		// MyXUngrabServer(dpy);
+ 	}
+ 	MyXUngrabKeyboard(dpy);
+ 
+@@ -3780,7 +3780,7 @@
+ 
+ 	if (!do_resize_opaque)
+ 	{
+-		MyXGrabServer(dpy);
++		// MyXGrabServer(dpy);
+ 	}
+ 	if (!XGetGeometry(
+ 		    dpy, (Drawable)ResizeWindow, &JunkRoot, &drag->x, &drag->y,
+@@ -3790,7 +3790,7 @@
+ 		UngrabEm(GRAB_NORMAL);
+ 		if (!do_resize_opaque)
+ 		{
+-			MyXUngrabServer(dpy);
++			// MyXUngrabServer(dpy);
+ 		}
+ 		return False;
+ 	}
+@@ -4326,7 +4326,7 @@
+ 		/* Throw away some events that dont interest us right now. */
+ 		discard_events(EnterWindowMask|LeaveWindowMask);
+ 		Scr.flags.is_wire_frame_displayed = False;
+-		MyXUngrabServer(dpy);
++		// MyXUngrabServer(dpy);
+ 	}
+ 	if (mr_args != NULL)
+ 	{

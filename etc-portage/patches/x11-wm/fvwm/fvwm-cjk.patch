@@ -1,0 +1,706 @@
+diff -u libs/Fft.c libs.cjk/Fft.c
+--- libs/Fft.c	2012-01-02 02:15:22.000000000 +0800
++++ libs.cjk/Fft.c	2012-01-02 02:52:48.000000000 +0800
+@@ -252,8 +252,12 @@
+ 	/* FIXME:  max_char_width should not be use in the all fvwm! */
+ 	if (FftUtf8Support && FLC_ENCODING_TYPE_IS_UTF_8(flf->fc))
+ 	{
++/*
+ 		FftTextExtentsUtf8(fftdpy, flf->fftf.fftfont, (FftChar8*)"W",
+ 				   1, &extents);
++*/
++		FftTextExtentsUtf8(fftdpy, (XftFont*)&(flf->fftf), (FftChar8*)"W",
++				   1, &extents);
+ 	}
+ 	else
+ 	{
+@@ -518,6 +522,9 @@
+ 	if (FftUtf8Support && FLC_ENCODING_TYPE_IS_UTF_8(flf->fc))
+ 	{
+ 		DrawStringFunc = (DrawStringFuncType)FftPDrawStringUtf8;
++		//add by kemean
++		fftf->fontset.rotation = fws->flags.text_rotation;
++		uf = (XftFont*)fftf;
+ 	}
+ 	else if (FLC_ENCODING_TYPE_IS_UTF_8(flf->fc))
+ 	{
+@@ -572,9 +579,14 @@
+ 	}
+ 	if (FftUtf8Support && FLC_ENCODING_TYPE_IS_UTF_8(flf->fc))
+ 	{
++/*
+ 		FftTextExtentsUtf8(
+ 				fftdpy, flf->fftf.fftfont, (FftChar8*)str, len,
+ 				&extents);
++*/
++		FftTextExtentsUtf8(
++			fftdpy, (XftFont*)&flf->fftf, (FftChar8*)str, len,
++				&extents);
+ 		result = extents.xOff;
+ 	}
+ 	else if (FLC_ENCODING_TYPE_IS_UTF_8(flf->fc))
+@@ -642,3 +654,511 @@
+ 	fflush (stdout);
+ 	return;
+ }
++
++
++/* ==================== fvwm cjk font support ===================*/
++#ifdef HAVE_XFT_UTF8
++
++fcjk_fallback_font fcjk_fallback_fonts[] = 
++{
++	{"xft::lang=zh" },
++	{"xft::lang=ja" },
++	{"xft::lang=ko" },
++	{NULL}
++};
++
++
++static bool fcjkLoadFont(fcjk_font* font, const char* name, unicode_t uc);
++static bool fcjkLoadCjkFont(fcjk_font* font, unicode_t uc);
++static XftFont* fcjkGetFont(fcjk_fontset* fontset, int fid);
++static int fcjkFindFont(fcjk_fontset* fontset, unicode_t uc);
++static void fcjkCloseFont(fcjk_font* font);
++
++
++
++bool fcjkFontsetInit(fcjk_fontset* fontset,
++					 Display* dpy,
++					 XftFont* font)
++{
++	if(NULL == fontset
++	   || NULL == dpy
++	   || NULL == font)
++	{
++		return false;
++	}
++	
++	fontset->dpy = dpy;
++	fontset->screen = DefaultScreen(dpy);
++	fontset->fallback = fcjk_fallback_fonts;
++
++	//cache fvwm font
++	memset(fontset->fonts, 0, sizeof(fcjk_font));
++	fontset->fonts[0].loaded = true;
++	fontset->fonts[0].ftf = font;
++	fontset->fonts[0].fontset = fontset;
++
++	int i = 0;
++	fontset->fsize = 1;
++	for(i = 1; i < MAX_FONT_NUM; i ++)
++	{
++		fontset->fonts[i].loaded = false;
++		fontset->fonts[i].ftf = NULL;
++		fontset->fonts[i].ftf_rotated_90 = NULL;
++		fontset->fonts[i].ftf_rotated_180 = NULL;
++		fontset->fonts[i].ftf_rotated_270 = NULL;
++		fontset->fonts[i].fontset = fontset;
++	}
++	
++	memset(fontset->fmap, 0xff, sizeof(fontset->fmap));
++	fontset->fmapsize = MAX_CODE_NUM;
++	
++	FT_Face face = XftLockFace(font);
++	fontset->weight = face->style_flags & FT_STYLE_FLAG_BOLD ? BOLD : MEDIUM;
++	fontset->slant = face->style_flags & FT_STYLE_FLAG_ITALIC ? ITALIC : ROMAN;
++	XftUnlockFace(font);
++
++	int value = 0;
++	if(FcPatternGetInteger(font->pattern, FC_PIXEL_SIZE, 0, &value) == FcResultMatch)
++	{
++		fontset->pixel = value;
++		fontset->size = 0;
++	}
++	else if(FcPatternGetInteger(font->pattern, FC_SIZE, 0, &value) == FcResultMatch)
++	{
++		fontset->pixel = 0;
++		fontset->size = value;
++	}
++	else
++	{
++		fontset->pixel = 0;
++		fontset->size = 11;
++	}
++	
++	XGlyphInfo extent;
++	XftTextExtentsUtf8(dpy, font, (FcChar8*)" ", 1, &extent);
++	fontset->blank_width = extent.xOff;
++	return true;
++}
++
++
++void fcjkFontsetDestroy(fcjk_fontset* fontset)
++{
++	if(NULL == fontset)
++	{
++		return;
++	}
++	
++	int i = 0;
++	for(i = 1; i < MAX_FONT_NUM; i ++)
++	{
++		fcjkCloseFont(fontset->fonts + i);
++	}
++
++	//don't close fonts[0].ftf
++	fcjk_font* font = fontset->fonts;
++	if(font->ftf_rotated_90 != NULL)
++	{
++		XftFontClose(font->fontset->dpy, font->ftf_rotated_90);
++		font->ftf_rotated_90 = NULL;
++	}
++
++	if(font->ftf_rotated_180 != NULL)
++	{
++		XftFontClose(font->fontset->dpy, font->ftf_rotated_180);
++		font->ftf_rotated_180= NULL;
++	}
++
++	if(font->ftf_rotated_270 != NULL)
++	{
++		XftFontClose(font->fontset->dpy, font->ftf_rotated_270);
++		font->ftf_rotated_270 = NULL;
++	}
++
++	font->loaded = false;
++}
++
++
++bool fcjkLoadFont(fcjk_font* font, const char* name, unicode_t uc)
++{
++	if(NULL == font
++	   || NULL == name)
++	{
++		return false;
++	}
++	
++	if(font->loaded)
++	{
++		return font->loaded;
++	}
++	
++	FcPattern* pattern = FcNameParse((FcChar8*)name);
++	if(NULL == pattern)
++	{
++		return false;
++	}
++	
++	fcjk_fontset* fontset = font->fontset;
++	
++	if(fontset->pixel > 0)
++	{
++		FcPatternDel(pattern, FC_PIXEL_SIZE);
++		FcPatternAddInteger(pattern, FC_PIXEL_SIZE, fontset->pixel);
++	}
++
++	if(fontset->size > 0)
++	{
++		FcPatternDel(pattern, FC_SIZE);
++		FcPatternAddInteger(pattern, FC_SIZE, fontset->size);
++	}
++	
++	if(fontset->weight == BOLD)
++	{
++		FcPatternDel(pattern, FC_WEIGHT);
++		FcPatternAddInteger(pattern, FC_WEIGHT, fontset->weight);
++	}
++	
++	if(fontset->slant == ITALIC)
++	{
++		FcPatternDel(pattern, FC_SLANT);
++		FcPatternAddInteger(pattern, FC_SLANT, fontset->slant);
++	}
++	
++	XftResult result;
++	FcPattern* match = XftFontMatch(fontset->dpy,
++									fontset->screen,
++									pattern,
++									&result);
++	FcPatternDestroy(pattern);
++
++	XftFont* ft = XftFontOpenPattern(fontset->dpy, match);
++	if(NULL == ft)
++	{
++		return false;
++	}
++
++
++	if(!XftCharExists(fontset->dpy, ft, uc))
++	{
++		XftFontClose(fontset->dpy, ft);
++		return false;
++	}
++
++	font->ftf = ft;
++	font->loaded = true;
++	return true;
++}
++
++
++bool fcjkLoadCjkFont(fcjk_font* font, unicode_t uc)
++{
++	if(NULL == font)
++	{
++		return false;
++	}
++
++	fcjk_fontset* fontset = font->fontset;
++	const char* lang = NULL;
++	for(lang = fontset->fallback->name;
++		lang != NULL;
++		fontset->fallback ++, lang = fontset->fallback->name)
++	{
++		FcPattern* pattern = FcNameParse((FcChar8*)lang);
++		if(NULL == pattern)
++		{
++			continue;
++		}
++
++		if(!FcConfigSubstitute(NULL, pattern, FcMatchPattern))
++		{
++			continue;
++		}
++
++		FcDefaultSubstitute(pattern);
++
++		XftResult result;
++		FcFontSet* fcfontset = NULL;
++		fcfontset = FcFontSort(NULL, pattern, FALSE, NULL, &result);
++		FcPatternDestroy(pattern);
++
++		if(NULL == fcfontset)
++		{
++			continue;
++		}
++
++		long i = 0;
++		FcChar8* lastname = NULL;
++		for(i = 0; i < fcfontset->nfont; i ++)
++		{
++			pattern = fcfontset->fonts[i];
++			FcChar8* name = NULL;
++			FcPatternGetString(pattern, FC_FULLNAME, 0, &name);
++			if(NULL == name)
++			{
++				continue;
++			}
++
++			if(lastname != NULL && strcasestr((char*)name, (char*)lastname) != NULL)
++			{
++				continue;
++			}
++
++			lastname = name;
++
++			if(fcjkLoadFont(font, name, uc))
++			{
++				FcFontSetDestroy(fcfontset);
++				return true;
++			}
++		}
++	
++	
++		FcFontSetDestroy(fcfontset);
++	}
++
++	return false;
++}
++
++
++int fcjkFindFont(fcjk_fontset* fontset, unicode_t uc)
++{
++	if(uc >= (1 << 20))
++	{
++		return 0;
++	}
++	
++	unicode_t hi = uc >> 8;
++	if(hi < fontset->fmapsize
++	   && fontset->fmap[hi][uc & 0xff] != 0xff)
++	{
++		return fontset->fmap[hi][uc & 0xff];
++	}
++	
++	//travers font-cache, match suitable font
++	int i = 0;
++	for(i = 0; i < fontset->fsize; i ++)
++	{
++		fcjk_font* font = fontset->fonts + i;
++
++		if(XftCharExists(fontset->dpy, font->ftf, uc))
++		{
++			goto found;
++		}
++
++		if(i == fontset->fsize - 1)
++		{
++			if(fcjkLoadCjkFont(&fontset->fonts[fontset->fsize], uc))
++			{
++				fontset->fsize ++;
++				continue;
++			}
++
++			break;
++		}
++	}
++
++	//if not found, use default font
++	i = 0;
++	
++found:
++	if(i < MAX_FONT_NUM)
++	{
++		fontset->fmap[hi][uc & 0xff] = i;
++	}
++
++	return i;
++}
++
++
++XftFont* fcjkGetFont(fcjk_fontset* fontset, int fid)
++{
++	if(NULL == fontset)
++	{
++		return NULL;
++	}
++	
++	fid &= 0xff;
++	
++	if(fontset->rotation == ROTATION_0)
++	{
++		return fontset->fonts[fid].ftf;
++	}
++	
++	if(fontset->rotation == ROTATION_90)
++	{
++		if(fontset->fonts[fid].ftf_rotated_90 == NULL)
++		{
++			fontset->fonts[fid].ftf_rotated_90 = FftGetRotatedFont(fontset->dpy,
++																   fontset->fonts[fid].ftf,
++																   fontset->rotation);
++		}
++		
++		return fontset->fonts[fid].ftf_rotated_90;
++	}
++	
++	if(fontset->rotation == ROTATION_180)
++	{
++		if(fontset->fonts[fid].ftf_rotated_180 == NULL)
++		{
++			fontset->fonts[fid].ftf_rotated_180 = FftGetRotatedFont(fontset->dpy,
++																	fontset->fonts[fid].ftf,
++																	fontset->rotation);
++		}
++		
++		return fontset->fonts[fid].ftf_rotated_180;
++	}
++
++	if(fontset->rotation == ROTATION_270)
++	{
++		if(fontset->fonts[fid].ftf_rotated_270 == NULL)
++		{
++			fontset->fonts[fid].ftf_rotated_270 = FftGetRotatedFont(fontset->dpy,
++																	fontset->fonts[fid].ftf,
++																	fontset->rotation);
++		}
++		
++		return fontset->fonts[fid].ftf_rotated_270;
++	}
++
++	return NULL;
++}
++
++
++
++void fcjkCloseFont(fcjk_font* font)
++{
++	if(NULL == font
++	   || !font->loaded)
++	{
++		return;
++	}
++	
++	if(font->ftf != NULL)
++	{
++		XftFontClose(font->fontset->dpy, font->ftf);
++		font->ftf = NULL;
++	}
++
++	if(font->ftf_rotated_90 != NULL)
++	{
++		XftFontClose(font->fontset->dpy, font->ftf_rotated_90);
++		font->ftf_rotated_90 = NULL;
++	}
++
++	if(font->ftf_rotated_180 != NULL)
++	{
++		XftFontClose(font->fontset->dpy, font->ftf_rotated_180);
++		font->ftf_rotated_180= NULL;
++	}
++
++	if(font->ftf_rotated_270 != NULL)
++	{
++		XftFontClose(font->fontset->dpy, font->ftf_rotated_270);
++		font->ftf_rotated_270 = NULL;
++	}
++
++	font->loaded = false;
++}
++
++
++void
++fcjkXftDrawStringUtf8 (XftDraw *draw,
++						_Xconst XftColor *color,
++						XftFont *pub,
++						int x, 
++						int	y,
++						_Xconst FcChar8 *string,
++						int len)
++{
++    FcChar32 ucs4;
++    int l;
++	FT_UInt glyph = 0;
++	
++	FftFontType* fftf = (FftFontType*)pub;
++	if(NULL == fftf)
++	{
++		return;
++	}
++
++	Display* dpy = XftDrawDisplay(draw);
++	XftFont* font = fftf->fontset.fonts[0].ftf;
++	XGlyphInfo gi;
++	
++    while (len && (l = FcUtf8ToUcs4 (string, &ucs4, len)) > 0)
++    {
++		//find a suitable font here
++		int fid = fcjkFindFont(&fftf->fontset, ucs4);
++		if(fid < 0 || fid >= MAX_FONT_NUM)
++		{
++			return;
++		}
++
++		font = fcjkGetFont(&fftf->fontset, fid);
++		if(NULL == font)
++		{
++			return;
++		}
++		
++		glyph = XftCharIndex (dpy, font, ucs4);
++		XftDrawGlyphs(draw, color, font, x, y, &glyph, 1);
++		
++		string += l;
++		len -= l;
++
++		XftGlyphExtents (dpy, font, &glyph, 1, &gi);
++
++		x += gi.xOff;
++		y += gi.yOff;
++    }
++}
++
++
++_X_EXPORT void
++fcjkXftTextExtentsUtf8 (Display *dpy,
++						 XftFont *pub,
++						 _Xconst FcChar8 *string, 
++						 int len,
++						 XGlyphInfo *extents)
++{
++    FcChar32	    ucs4;
++    int		    l;
++	FT_UInt glyph = 0;
++	int width = 0;
++
++	FftFontType* fftf = (FftFontType*)pub;
++	if(NULL == fftf)
++	{
++		return;
++	}
++
++    while (len && (l = FcUtf8ToUcs4 (string, &ucs4, len)) > 0)
++    {
++		//find a suitable font here
++		int fid = fcjkFindFont(&fftf->fontset, ucs4);
++		if(fid < 0 || fid >= MAX_FONT_NUM)
++		{
++			return;
++		}
++
++		pub = fcjkGetFont(&fftf->fontset, fid);
++		if(NULL == pub)
++		{
++			return;
++		}
++
++		glyph = XftCharIndex (dpy, pub, ucs4);
++
++		XGlyphInfo tmp_extent;
++		XftGlyphExtents (dpy, pub, &glyph, 1, &tmp_extent);
++		
++		*extents = tmp_extent;
++		width += tmp_extent.xOff;
++
++		string += l;
++		len -= l;
++    }
++
++	extents->xOff = width;
++}
++
++#endif
++
+diff -u libs/Fft.h libs.cjk/Fft.h
+--- libs/Fft.h	2012-01-02 02:15:22.000000000 +0800
++++ libs.cjk/Fft.h	2012-01-02 02:29:56.000000000 +0800
+@@ -23,6 +23,93 @@
+ 
+ #include "FRender.h"
+ 
++
++
++/* ==================== fvwm cjk font support  ====================*/
++/*
++ * author: kemean, E-mail:terisli@foxmail.com
++ * date: 2009-02-13
++ *
++ */
++#ifdef HAVE_XFT_UTF8
++#include <X11/Xft/XftCompat.h>
++#include <inttypes.h>
++typedef uint32_t unicode_t;
++typedef unsigned char bool;
++#define true 1
++#define false 0
++#define MAX_FONT_NUM 256
++#define MAX_CODE_NUM 256
++#define MAX(a, b)  (((a) >= (b)) ? (a) : (b))
++
++enum
++{
++	UNSET = -1,
++	MEDIUM = XFT_WEIGHT_MEDIUM,
++	BOLD = XFT_WEIGHT_BOLD,
++	ROMAN = XFT_SLANT_ROMAN,
++	ITALIC = XFT_SLANT_ITALIC,
++};
++
++
++struct fcjk_fontset_t;
++typedef struct fcjk_font_t
++{
++	bool loaded;
++	XftFont* ftf;
++	XftFont *ftf_rotated_90;
++	XftFont *ftf_rotated_180;
++	XftFont *ftf_rotated_270;
++	struct fcjk_fontset_t* fontset;
++}fcjk_font;
++
++typedef struct fcjk_fallback_font_t
++{
++  const char *name;
++}fcjk_fallback_font;
++
++struct _FftFontType;
++typedef struct fcjk_fontset_t
++{
++	int size, pixel, weight, slant;
++	int blank_width;
++	rotation_t rotation;
++	unsigned char fmap[MAX_CODE_NUM][MAX_CODE_NUM];
++	int fmapsize;
++	fcjk_font fonts[MAX_FONT_NUM];
++	int fsize;
++	fcjk_fallback_font *fallback;
++	Display* dpy;
++	int screen;
++}fcjk_fontset;
++
++
++bool fcjkFontsetInit(fcjk_fontset* fontset,
++					 Display* dpy,
++					 XftFont* font);
++
++void fcjkFontsetDestroy(fcjk_fontset* fontset);
++
++void fcjkXftDrawStringUtf8(XftDraw* draw, 
++						   _Xconst XftColor* color, 
++						   XftFont* pub, 
++						   int x,
++						   int y,
++						   _Xconst FcChar8 *string,
++						   int len);
++
++void fcjkXftTextExtentsUtf8(Display* dpy,
++							XftFont* pub,
++							_Xconst FcChar8* string,
++							int len,
++							XGlyphInfo* extents);
++
++#endif //HAVE_XFT_UTF8
++/* =================== end fvwm cjk font support  ====================*/
++
++
++
++
+ /* ---------------------------- global definitions ------------------------- */
+ 
+ #ifdef HAVE_XFT
+@@ -303,7 +390,7 @@
+  * Fvwm Xft font structure
+  */
+ 
+-typedef struct
++typedef struct _FftFontType
+ {
+ 	FftFont *fftfont;
+ 	FftFont *fftfont_rotated_90;
+@@ -311,6 +398,7 @@
+ 	FftFont *fftfont_rotated_270;
+ 	char *encoding;
+ 	char *str_encoding;
++	fcjk_fontset fontset;
+ } FftFontType;
+ 
+ /* ---------------------------- exported variables (globals) --------------- */
+@@ -540,9 +628,9 @@
+ 
+ /* utf8 functions */
+ #if FftUtf8Support
+-#define FftDrawStringUtf8(a,b,c,d,e,f,g) XftDrawStringUtf8(a,b,c,d,e,f,g)
+-#define FftPDrawStringUtf8 XftDrawStringUtf8
+-#define FftTextExtentsUtf8(a,b,c,d,e) XftTextExtentsUtf8(a,b,c,d,e)
++#define FftDrawStringUtf8(a,b,c,d,e,f,g) fcjkXftDrawStringUtf8(a,b,c,d,e,f,g)
++#define FftPDrawStringUtf8 fcjkXftDrawStringUtf8
++#define FftTextExtentsUtf8(a,b,c,d,e) fcjkXftTextExtentsUtf8(a,b,c,d,e)
+ #else
+ #define FftDrawStringUtf8(a,b,c,d,e,f,g)
+ #define FftPDrawStringUtf8 FftPDumyFunc
+diff -u libs/Flocale.c libs.cjk/Flocale.c
+--- libs/Flocale.c	2012-01-02 02:15:22.000000000 +0800
++++ libs.cjk/Flocale.c	2012-01-02 02:29:57.000000000 +0800
+@@ -1593,6 +1593,12 @@
+ 		free(encoding);
+ 	}
+ 
++	//add by kemean , 2009-02-18, for fcjk fontset init
++	if(flf->fftf.fftfont != NULL)
++	{
++		fcjkFontsetInit(&flf->fftf.fontset, dpy, flf->fftf.fftfont);
++	}
++	
+ 	return flf;
+ }
+ 
+@@ -1619,6 +1625,9 @@
+ 	}
+ 	if (FftSupport && flf->fftf.fftfont != NULL)
+ 	{
++		//add by kemean, 2009-02-18, for fcjk fontset destroy
++		fcjkFontsetDestroy(&flf->fftf.fontset);
++		
+ 		FftFontClose(dpy, flf->fftf.fftfont);
+ 		if (flf->fftf.fftfont_rotated_90 != NULL)
+ 			FftFontClose(dpy, flf->fftf.fftfont_rotated_90);

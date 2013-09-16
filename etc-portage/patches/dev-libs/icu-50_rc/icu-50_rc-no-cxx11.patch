@@ -1,0 +1,54 @@
+--- source/configure~	2012-10-23 06:11:52.000000000 +0100
++++ source/configure	2012-11-01 23:32:32.151803019 +0000
+@@ -7002,51 +7002,6 @@
+             CFLAGS="${OLD_CFLAGS}"
+         fi
+     fi
+-    if test "$GXX" = yes; then
+-        OLD_CXXFLAGS="${CXXFLAGS}"
+-        # -Wno-return-type-c-linkage is desired so that stable ICU API is not warned about.
+-        CXXFLAGS="${CXXFLAGS} -std=c++11"
+-        ac_ext=cpp
+-ac_cpp='$CXXCPP $CPPFLAGS'
+-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+-
+-        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-
+-static const char16_t test[] = u"This is a UTF16 literal string.";
+-
+-int
+-main ()
+-{
+-
+-  ;
+-  return 0;
+-}
+-_ACEOF
+-if ac_fn_cxx_try_compile "$LINENO"; then :
+-  CXX_UTF16_STRING=1
+-else
+-  CXX_UTF16_STRING=0
+-fi
+-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+-        ac_ext=c
+-ac_cpp='$CPP $CPPFLAGS'
+-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+-ac_compiler_gnu=$ac_cv_c_compiler_gnu
+-
+-        if test "$CXX_UTF16_STRING" = 1; then
+-            if test "$CC_UTF16_STRING" = 1; then
+-                CHECK_UTF16_STRING_RESULT="available";
+-            else
+-                CHECK_UTF16_STRING_RESULT="C++ only";
+-            fi
+-        else
+-            CXXFLAGS="${OLD_CXXFLAGS}"
+-        fi
+-    fi
+ fi
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CHECK_UTF16_STRING_RESULT" >&5
+ $as_echo "$CHECK_UTF16_STRING_RESULT" >&6; }

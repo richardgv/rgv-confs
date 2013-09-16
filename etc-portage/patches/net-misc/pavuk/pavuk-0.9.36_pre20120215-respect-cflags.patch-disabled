@@ -1,0 +1,101 @@
+Only in pavuk: autom4te.cache
+Only in pavuk: configure
+diff -ur --exclude '*~' --exclude '.*.sw*' pavuk.orig/configure.in pavuk/configure.in
+--- pavuk.orig/configure.in	2013-04-28 12:09:41.039921905 +0800
++++ pavuk/configure.in	2013-04-28 12:34:02.919911362 +0800
+@@ -496,13 +496,7 @@
+ # solution, I'm all for it!
+ #                                               Ger Hobbelt
+ WITH_BUILD=""
+-if test "x$WITH_DEBUGGING" != "xdefault"; then
+-  if test ! -z "$SED"; then
+-    CFLAGS=`echo " ${CFLAGS} " | $SED -e 's: -O[[0-3]] ::' -e 's: -g ::' -e 's:  : :g'`
+-    CPPFLAGS=`echo " ${CPPFLAGS} " | $SED -e 's: -O[[0-3]] ::' -e 's: -g ::' -e 's:  : :g'`
+-  fi
+-  if test "x$WITH_DEBUGGING" = "xyes"; then
+-    AX_CFLAGS_GCC_OPTION([-O0])
++if "x$WITH_DEBUGGING" = "xyes"; then
+     AX_CFLAGS_GCC_OPTION([-ggdb3],
+       [],
+       [],
+@@ -511,15 +505,7 @@
+         [],
+         [AX_CFLAGS_GCC_OPTION([-g])])]) # symbolic debugging
+     WITH_BUILD="debug"
+-    #WITH_DEBUGGING=yes
+-  else
+-    AX_CFLAGS_GCC_OPTION([-O3],
+-      [],
+-      [],
+-      [AX_CFLAGS_GCC_OPTION([-O2])])
+-    WITH_BUILD="release (maximum optimizations)"
+-    WITH_DEBUGGING=no
+-  fi
++    WITH_DEBUGGING=yes
+ else
+   # AX_CFLAGS_GCC_OPTION([-O2])
+   WITH_BUILD="release (default optimizations)"
+@@ -529,32 +515,6 @@
+ #
+ # include run-time profiling support (requires the use of specific development tools: prof/gprof)
+ #
+-WITH_GPROFILING="no"
+-WITH_PROFILING="no"
+-
+-AC_MSG_CHECKING([if we want to instrument the build for profiling])
+-AC_ARG_ENABLE([profiling], AC_HELP_STRING([--enable-profiling],
+-  [You can explicitly specify '--enable-profiling' to
+-create a pavuk build which can be profiled with, for
+-example, gprof. (default: profiling turned OFF)]),
+-  [
+-   AC_MSG_RESULT([$enable_profiling])
+-   ac_profiling_cc_flags=""
+-   AX_CFLAGS_GCC_OPTION([-pg], [ac_profiling_cc_flags],
+-        [
+-         WITH_GPROFILING="yes"
+-         AC_MSG_RESULT([$enable_profiling (gprof)])
+-        ],
+-    [
+-     AX_CFLAGS_GCC_OPTION([-p], [ac_profiling_cc_flags],
+-        [
+-        WITH_PROFILING="yes"
+-        AC_MSG_RESULT([$enable_profiling (prof)])
+-        ])
+-       ])
+-   # delay copying into CFLAGS/LDFLAGS; we don't want to influence the cc used to test stuff in this configure script
+-  ],
+-  [AC_MSG_RESULT([no])])
+ 
+ #
+ # maximum warning level for neurotic developers? (default = yes)
+@@ -2657,9 +2617,6 @@
+ AC_SUBST(PAVUK_UTFMODE)
+ 
+ 
+-# write delayed options into CFLAGS/LDFLAGS:
+-AX_ADD_OPTION([CFLAGS], [$ac_profiling_cc_flags])
+-AX_ADD_OPTION([LDFLAGS], [$ac_profiling_cc_flags])
+ 
+ 
+ 
+@@ -2752,8 +2709,6 @@
+ * PAVUK options
+ 
+   Development-time debugging:              ${WITH_DEBUGGING}
+-  Allow profiling using gprof:             ${WITH_GPROFILING}
+-  Allow profiling using prof:              ${WITH_PROFILING}
+   Include debug features:                  ${WITH_DEBUG_FEATURES}
+   Debug build (extra run-time checks):     ${WITH_DEBUG_BUILD}
+ 
+diff -ur --exclude '*~' --exclude '.*.sw*' pavuk.orig/src/htmlparser.c pavuk/src/htmlparser.c
+--- pavuk.orig/src/htmlparser.c	2013-04-28 12:09:41.039921905 +0800
++++ pavuk/src/htmlparser.c	2013-04-28 12:18:47.799917962 +0800
+@@ -1991,7 +1991,7 @@
+         p += strspn(p, "\n\r");
+     }
+ 
+-    if (hpinfo->rewrite)
++    if (hpinfo->rewrite && stackc)
+     {
+         ilen = strlen(stackc);
+         hpinfo->stack_offset = 0;

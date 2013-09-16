@@ -1,0 +1,7 @@
+dev-vcs/gitstats::gentoo
+>=x11-wm/compiz-0.9::local_overlay
+>=x11-wm/emerald-0.9::local_overlay
+dev-python/PyQt4::qt
+dev-python/sip::qt
+dev-qt/designer:5
+# =dev-lang/python-*_pre*::progress

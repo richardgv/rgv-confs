@@ -1,0 +1,14 @@
+--- cairo-1.12.12/src/cairo-png.c~	2013-04-10 12:34:59.600243354 +0800
++++ cairo-1.12.12/src/cairo-png.c	2013-04-10 13:28:21.240287542 +0800
+@@ -151,9 +151,10 @@
+ {
+     cairo_status_t *error = png_get_error_ptr (png);
+ 
+-    /* default to the most likely error */
++    /* ignores the warning
+     if (*error == CAIRO_STATUS_SUCCESS)
+ 	*error = _cairo_error (CAIRO_STATUS_NO_MEMORY);
++	*/
+ 
+     /* png does not expect to abort and will try to tidy up after a warning */
+ }

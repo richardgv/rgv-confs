@@ -1,0 +1,29 @@
+--- xfwm4-4.10.1/src/wireframe.c~	2013-08-01 22:42:20.319939103 +0800
++++ xfwm4-4.10.1/src/wireframe.c	2013-08-01 22:42:24.759939071 +0800
+@@ -134,6 +134,26 @@
+                              0, CopyFromParent, CopyFromParent,
+                              (Visual *) CopyFromParent,
+                              CWOverrideRedirect | CWBackPixel, &attrs);
++    {
++        static const char *name = "xfwm4-wireframe";
++        // gcc is a piece of crap...
++        static XTextProperty nameprop = {
++            .encoding = XA_STRING,
++            .format = 8,
++        };
++        if (!nameprop.nitems) {
++            nameprop.value = name;
++            nameprop.nitems = strlen(name);
++        }
++        XSetWMName(clientGetXDisplay(c), xwindow, &nameprop);
++    }
++    {
++        XClassHint *pch = XAllocClassHint();
++        pch->res_name = "xfwm4";
++        pch->res_class = "Xfwm4";
++        XSetClassHint(clientGetXDisplay(c), xwindow, pch);
++        XFree(pch);
++    }
+     wireframeUpdate (c, xwindow);
+ 
+     return (xwindow);

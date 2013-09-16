@@ -1,0 +1,14 @@
+diff --git a/src/url.c b/src/url.c
+index 70cc90d..52e7915 100644
+--- a/src/url.c
++++ b/src/url.c
+@@ -1936,7 +1936,8 @@ void cat_links_to_url_list(dllist *l1)
+ 
+     while (p)
+     {
+-        if (url_append_condition((url *)p->data, &condp))
++        url *pu = (url *) p->data;
++        if (url_append_condition(pu, &condp) && URLT_FROMPARENT != pu->type)
+         {
+             url_clear_anchor((url *)p->data);
+             if (NULL != (same = url_was_befor((url *)p->data)))

@@ -1,0 +1,11 @@
+--- src/core/errorhandler.c~	2013-01-26 03:47:08.000000000 +0800
++++ src/core/errorhandler.c	2013-03-29 08:25:39.760010746 +0800
+@@ -69,8 +69,6 @@
+         case SIGWINCH:
+             signal(signo, SIG_IGN);
+             break;
+-        default:
+-            signal(signo, OnException);
+         }
+     }
+ }

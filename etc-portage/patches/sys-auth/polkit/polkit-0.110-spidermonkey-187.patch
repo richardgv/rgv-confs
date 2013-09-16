@@ -1,0 +1,69 @@
+--- src/polkitbackend/polkitbackendjsauthority.c	2013-01-10 03:33:52.000000000 +0800
++++ src/polkitbackend/polkitbackendjsauthority.new.c	2013-03-27 21:14:16.409833452 +0800
+@@ -183,6 +183,13 @@
+ static JSBool          (*dJS_StrictPropertyStub)(JSContext *cx, JSObject *obj, jsid id, JSBool strict, jsval *vp);
+ static void            (*dJS_TriggerOperationCallback)(JSContext *cx);
+ 
++static JS_PUBLIC_DATA(jsval) *dJSVAL_NULL;
++static JS_PUBLIC_DATA(jsval) *dJSVAL_ZERO;
++static JS_PUBLIC_DATA(jsval) *dJSVAL_ONE;
++static JS_PUBLIC_DATA(jsval) *dJSVAL_FALSE;
++static JS_PUBLIC_DATA(jsval) *dJSVAL_TRUE;
++static JS_PUBLIC_DATA(jsval) *dJSVAL_VOID;
++
+ #define DJS_SYMBOL(x) {#x, (void*) &d ## x}
+ static const struct {
+   const char *name;
+@@ -228,8 +235,25 @@
+   DJS_SYMBOL(JS_ShutDown),
+   DJS_SYMBOL(JS_StrictPropertyStub),
+   DJS_SYMBOL(JS_TriggerOperationCallback),
++
++  // Fetch global variable symbols
++  DJS_SYMBOL(JSVAL_NULL),
++  DJS_SYMBOL(JSVAL_ZERO),
++  DJS_SYMBOL(JSVAL_ONE),
++  DJS_SYMBOL(JSVAL_FALSE),
++  DJS_SYMBOL(JSVAL_TRUE),
++  DJS_SYMBOL(JSVAL_VOID),
+ };
+ 
++// Ugly hack to make it use *dJSVAL_NULL instead of JSVAL_NULL directly
++static JS_ALWAYS_INLINE jsval
++dOBJECT_TO_JSVAL(JSObject *obj)
++{
++    if (obj)
++        return IMPL_TO_JSVAL(OBJECT_TO_JSVAL_IMPL(obj));
++    return *dJSVAL_NULL;
++}
++
+ static gboolean
+ djs_init (PolkitBackendJsAuthority *authority)
+ {
+@@ -238,7 +262,7 @@
+   guint n;
+   const gchar *library_name;
+ 
+-  library_name = "libmozjs185.so.1.0";
++  library_name = "libmozjs187.so.1.0";
+   module = g_module_open (library_name, 0);
+   if (module == NULL)
+     goto out;
+@@ -790,7 +814,7 @@
+ 
+   array_object = dJS_NewArrayObject (authority->priv->cx, (jsint) len, jsvals);
+ 
+-  value_jsval = OBJECT_TO_JSVAL (array_object);
++  value_jsval = dOBJECT_TO_JSVAL (array_object);
+   dJS_SetProperty (authority->priv->cx, obj, name, &value_jsval);
+ 
+   g_free (jsvals);
+@@ -1368,7 +1392,7 @@
+ 
+   ret = JS_TRUE;
+ 
+-  JS_SET_RVAL (cx, vp, JSVAL_VOID);  /* return undefined */
++  JS_SET_RVAL (cx, vp, *dJSVAL_VOID);  /* return undefined */
+  out:
+   return ret;
+ }

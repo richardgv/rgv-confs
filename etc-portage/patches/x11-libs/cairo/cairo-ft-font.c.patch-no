@@ -1,0 +1,310 @@
+--- src/cairo-ft-font.c	2011-01-30 11:05:56.709210029 +0000
++++ src/cairo-ft-font.c	2011-01-30 11:42:31.169860095 +0000
+@@ -1578,6 +1578,7 @@
+ #ifdef FC_HINT_STYLE
+     int hintstyle;
+ #endif
++    int lcd_filter;
+ 
+     _cairo_font_options_init_default (&ft_options.base);
+     ft_options.load_flags = FT_LOAD_DEFAULT;
+@@ -1587,81 +1588,125 @@
+ #define FC_EMBEDDED_BITMAP "embeddedbitmap"
+ #endif
+ 
++#ifndef FcUndefined
++#define FcUndefined -1
++#endif
+     /* Check whether to force use of embedded bitmaps */
+     if (FcPatternGetBool (pattern,
+ 			  FC_EMBEDDED_BITMAP, 0, &bitmap) != FcResultMatch)
+-	bitmap = FcFalse;
++	bitmap = FcUndefined;
+ 
+-    /* disable antialiasing if requested */
+-    if (FcPatternGetBool (pattern,
+-			  FC_ANTIALIAS, 0, &antialias) != FcResultMatch)
+-	antialias = FcTrue;
+-    
+-    if (antialias) {
+-	cairo_subpixel_order_t subpixel_order;
+-	int lcd_filter;
+-
+-	/* disable hinting if requested */
+-	if (FcPatternGetBool (pattern,
+-			      FC_HINTING, 0, &hinting) != FcResultMatch)
+-	    hinting = FcTrue;
+-
+-	if (FcPatternGetInteger (pattern,
+-				 FC_RGBA, 0, &rgba) != FcResultMatch)
+-	    rgba = FC_RGBA_UNKNOWN;
++    if (FcPatternGetInteger (pattern, 
++			     FC_RGBA, 0, &rgba) != FcResultMatch)
++	rgba = FC_RGBA_UNKNOWN;
++
++    /* Checking if antialias property was delivered from FontConfig */
++    if (FcPatternGetBool (pattern, FC_ANTIALIAS, 0, &antialias) != FcResultMatch)
++    	antialias = FcUndefined;
++
++    /* 
++     * There are several cases of FontConfig setting we have to deal with
++     *   a) antialias == true, rgba == rgb/bgr/vrgb/vbgr      
++     *   b) antialias == true, rgba == none                   
++     *   c) antialias == true, rgba undefined                 
++     *   d) antialias == false                                
++     *   e) antialias == undefined, rgba == rgb/bgr/vrgb/vbgr  
++     *   f) antialias == undefined, rgba == none               
++     *   g) antialias == undefined, rgba undefined            
++     * 
++     * They are processed in following manner:
++     * a-c) antialias is defined and is true 
++     *   In such case we have to decide what type of antialias to select: GRAY or SUBPIXEL.
++     *   This is done based on the subpixel_order property.
++     *   - CAIRO_ANTIALIAS_GRAY when rgba is FC_RGBA_NONE
++     *   - CAIRO_ANTIALIAS_SUBPIXEL otherwise (if the rgba is rgb/bgr/vrgb/vbgr 
++     *     or subpixel wasn't defined in FC at all)
++     *
++     * d) antialias property is defined and is false
++     *   In such case we set the CAIRO_ANTIALIAS_NONE
++     *
++     * e-g) antialias property is not defined        
++     *   - the subpixel_order was specified in FC - very unlikely scenario, 
++     *     but in such case we are assuming antialiasing should be switched on.
++     *     Type of antialias is set it to CAIRO_ANTIALIAS_GRAY or CAIRO_ANTIALIAS_SUBPIXEL 
++     *     based on the rgba type.
++     *   - the subpixel_order was not specified as well - we are setting CAIRO_ANTIALIAS_DEFAULT
++     */
++    if ( (antialias == FcTrue) || 
++	 ( (antialias == FcUndefined) && (rgba != FC_RGBA_UNKNOWN) ) ) {
++        if (rgba == FC_RGBA_NONE) {
++            ft_options.base.antialias = CAIRO_ANTIALIAS_GRAY;
++	    ft_options.base.subpixel_order = CAIRO_SUBPIXEL_ORDER_DEFAULT;
++        } else {
++            ft_options.base.antialias = CAIRO_ANTIALIAS_SUBPIXEL;
++	    /* ft_options.base.subpixel_order will be set later */
++        } 
++    } else if (antialias == FcFalse) {
++	ft_options.base.antialias = CAIRO_ANTIALIAS_NONE;
++	ft_options.base.subpixel_order = CAIRO_SUBPIXEL_ORDER_DEFAULT;
++    } /* Antialias property not defined in Fontconfig and rgba is not set.
++       * Not doing anything - staying with CAIRO_ANTIALIAS_DEFAULT */
+ 
++    if ( ft_options.base.antialias == CAIRO_ANTIALIAS_SUBPIXEL ) {
+ 	switch (rgba) {
+ 	case FC_RGBA_RGB:
+-	    subpixel_order = CAIRO_SUBPIXEL_ORDER_RGB;
++	    ft_options.base.subpixel_order = CAIRO_SUBPIXEL_ORDER_RGB;
+ 	    break;
+ 	case FC_RGBA_BGR:
+-	    subpixel_order = CAIRO_SUBPIXEL_ORDER_BGR;
++	    ft_options.base.subpixel_order = CAIRO_SUBPIXEL_ORDER_BGR;
+ 	    break;
+ 	case FC_RGBA_VRGB:
+-	    subpixel_order = CAIRO_SUBPIXEL_ORDER_VRGB;
++	    ft_options.base.subpixel_order = CAIRO_SUBPIXEL_ORDER_VRGB;
+ 	    break;
+ 	case FC_RGBA_VBGR:
+-	    subpixel_order = CAIRO_SUBPIXEL_ORDER_VBGR;
++	    ft_options.base.subpixel_order = CAIRO_SUBPIXEL_ORDER_VBGR;
+ 	    break;
+ 	case FC_RGBA_UNKNOWN:
+ 	case FC_RGBA_NONE:
+ 	default:
+-	    subpixel_order = CAIRO_SUBPIXEL_ORDER_DEFAULT;
++	    ft_options.base.subpixel_order = CAIRO_SUBPIXEL_ORDER_DEFAULT;
+ 	    break;
+ 	}
++    }
+ 
+-	if (subpixel_order != CAIRO_SUBPIXEL_ORDER_DEFAULT) {
+-	    ft_options.base.subpixel_order = subpixel_order;
+-	    ft_options.base.antialias = CAIRO_ANTIALIAS_SUBPIXEL;
+-	}
+-
+-	if (FcPatternGetInteger (pattern,
+-				 FC_LCD_FILTER, 0, &lcd_filter) == FcResultMatch)
+-	{
+-	    switch (lcd_filter) {
+-	    case FC_LCD_NONE:
+-		ft_options.base.lcd_filter = CAIRO_LCD_FILTER_NONE;
+-		break;
+-	    case FC_LCD_DEFAULT:
+-		ft_options.base.lcd_filter = CAIRO_LCD_FILTER_FIR5;
+-		break;
+-	    case FC_LCD_LIGHT:
+-		ft_options.base.lcd_filter = CAIRO_LCD_FILTER_FIR3;
+-		break;
+-	    case FC_LCD_LEGACY:
+-		ft_options.base.lcd_filter = CAIRO_LCD_FILTER_INTRA_PIXEL;
+-		break;
+-	    }
++    if (FcPatternGetInteger (pattern, FC_LCD_FILTER, 0, &lcd_filter) == FcResultMatch) {
++	switch (lcd_filter) {
++	case FC_LCD_NONE:
++	    ft_options.base.lcd_filter = CAIRO_LCD_FILTER_NONE;
++	    break;
++	case FC_LCD_DEFAULT:
++	    ft_options.base.lcd_filter = CAIRO_LCD_FILTER_FIR5;
++	    break;
++	case FC_LCD_LIGHT:
++	    ft_options.base.lcd_filter = CAIRO_LCD_FILTER_FIR3;
++	    break;
++	case FC_LCD_LEGACY:
++	    ft_options.base.lcd_filter = CAIRO_LCD_FILTER_INTRA_PIXEL;
++	    break;
+ 	}
+-
+-#ifdef FC_HINT_STYLE
+-	if (FcPatternGetInteger (pattern,
+-				 FC_HINT_STYLE, 0, &hintstyle) != FcResultMatch)
+-	    hintstyle = FC_HINT_FULL;
+-
+-	if (!hinting)
+-	    hintstyle = FC_HINT_NONE;
+-
++    } /* No LCD_FILTER property in FontConfig - staying with default CAIRO_LCD_FILTER_DEFAULT. */
++        
++    /* 
++     * Processing hinting information
++     * Hinting should be processed also when no antialias information delivered from FontConfig 
++     */
++    if (FcPatternGetBool (pattern, FC_HINTING, 0, &hinting) != FcResultMatch)
++        hinting = FcUndefined;
++
++    /* 
++     * If hininng is forced off, setting CAIRO_HINT_STYLE_NONE
++     * If hinting is not forced off, processing hintstyle and setting appropiate style
++     * If hinting is not forced off nor hintstyle defined, 
++     *   staing with the default CAIRO_HINT_STYLE_DEFAUT
++     *   defined by _cairo_font_options_init_default
++     */
++    if (hinting == FcFalse) 
++        ft_options.base.hint_style = CAIRO_HINT_STYLE_NONE;
++
++#ifdef FC_HINT_STYLE    
++    if ( (hinting != FcFalse) &&
++	 (FcPatternGetInteger (pattern, 
++			       FC_HINT_STYLE, 0, &hintstyle) == FcResultMatch) ) {
+ 	switch (hintstyle) {
+ 	case FC_HINT_NONE:
+ 	    ft_options.base.hint_style = CAIRO_HINT_STYLE_NONE;
+@@ -1677,46 +1722,39 @@
+ 	    ft_options.base.hint_style = CAIRO_HINT_STYLE_FULL;
+ 	    break;
+ 	}
+-#else /* !FC_HINT_STYLE */
+-	if (!hinting) {
+-	    ft_options.base.hint_style = CAIRO_HINT_STYLE_NONE;
+-	}
++    }
+ #endif /* FC_HINT_STYLE */
+ 
+-	/* Force embedded bitmaps off if no hinting requested */
+-	if (ft_options.base.hint_style == CAIRO_HINT_STYLE_NONE)
+-	  bitmap = FcFalse;
+-
+-	if (!bitmap)
+-	    ft_options.load_flags |= FT_LOAD_NO_BITMAP;
++    /* Force embedded bitmaps off if no hinting requested */
++    if (ft_options.base.hint_style == CAIRO_HINT_STYLE_NONE)
++        bitmap = FcFalse;
+ 
+-    } else {
+-	ft_options.base.antialias = CAIRO_ANTIALIAS_NONE;
+-    }
++    if (bitmap == FcFalse)
++	ft_options.load_flags |= FT_LOAD_NO_BITMAP;
+ 
+     /* force autohinting if requested */
+     if (FcPatternGetBool (pattern,
+ 			  FC_AUTOHINT, 0, &autohint) != FcResultMatch)
+-	autohint = FcFalse;
++	autohint = FcUndefined;
+ 
+-    if (autohint)
++    if (autohint == FcTrue)
+ 	ft_options.load_flags |= FT_LOAD_FORCE_AUTOHINT;
+ 
+     if (FcPatternGetBool (pattern,
+ 			  FC_VERTICAL_LAYOUT, 0, &vertical_layout) != FcResultMatch)
+-	vertical_layout = FcFalse;
++	vertical_layout = FcUndefined;
+ 
+-    if (vertical_layout)
++    if (vertical_layout == FcTrue)
+ 	ft_options.load_flags |= FT_LOAD_VERTICAL_LAYOUT;
+ 
+ #ifndef FC_EMBOLDEN
+ #define FC_EMBOLDEN "embolden"
+ #endif
+-    if (FcPatternGetBool (pattern,
++    if (FcPatternGetBool (pattern, 
+ 			  FC_EMBOLDEN, 0, &embolden) != FcResultMatch)
+-	embolden = FcFalse;
+-
+-    if (embolden)
++	embolden = FcUndefined;
++    
++    if (embolden == FcTrue)
+ 	ft_options.extra_flags |= CAIRO_FT_OPTIONS_EMBOLDEN;
+ 
+     *ret = ft_options;
+@@ -1736,31 +1774,38 @@
+     if (load_flags & FT_LOAD_NO_HINTING)
+ 	other->base.hint_style = CAIRO_HINT_STYLE_NONE;
+ 
+-    if (other->base.antialias == CAIRO_ANTIALIAS_NONE ||
+-	options->base.antialias == CAIRO_ANTIALIAS_NONE) {
+-	options->base.antialias = CAIRO_ANTIALIAS_NONE;
+-	options->base.subpixel_order = CAIRO_SUBPIXEL_ORDER_DEFAULT;
+-    }
+-
+-    if (other->base.antialias == CAIRO_ANTIALIAS_SUBPIXEL &&
+-	(options->base.antialias == CAIRO_ANTIALIAS_DEFAULT ||
+-	 options->base.antialias == CAIRO_ANTIALIAS_GRAY)) {
+-	options->base.antialias = CAIRO_ANTIALIAS_SUBPIXEL;
+-	options->base.subpixel_order = other->base.subpixel_order;
++    /* If others structure defines settings for antialiasing, we are processing them */
++    if (other->base.antialias != CAIRO_ANTIALIAS_DEFAULT) {
++	if ( other->base.antialias == CAIRO_ANTIALIAS_NONE ) {
++	    /* Force antialias off */
++	    options->base.antialias = CAIRO_ANTIALIAS_NONE;
++	    options->base.subpixel_order = CAIRO_SUBPIXEL_ORDER_DEFAULT;
++	} else { 
++	    /* Force antialias on */
++
++	    /* If antialias==CAIRO_ANTIALIAS_SUBPIXEL is set, 
++	     * but the subpixel_order is set to CAIRO_SUBPIXEL_ORDER_DEFAULT, 
++	     * we have to determine what type of antialiasing will be used based
++	     * on current subpixel order */	    
++	    if ( (other->base.subpixel_order == CAIRO_SUBPIXEL_ORDER_DEFAULT) &&
++	         (other->base.antialias == CAIRO_ANTIALIAS_SUBPIXEL) ) {
++		if (options->base.subpixel_order == CAIRO_SUBPIXEL_ORDER_DEFAULT) 
++		    options->base.antialias = CAIRO_ANTIALIAS_GRAY;
++		else
++		    options->base.antialias = CAIRO_ANTIALIAS_SUBPIXEL;
++	    } else {
++		options->base.subpixel_order = other->base.subpixel_order;
++		options->base.antialias = other->base.antialias;
++	    }
++	}
+     }
+-
+-    if (options->base.hint_style == CAIRO_HINT_STYLE_DEFAULT)
++	
++    if (other->base.hint_style != CAIRO_HINT_STYLE_DEFAULT)
+ 	options->base.hint_style = other->base.hint_style;
+ 
+-    if (other->base.hint_style == CAIRO_HINT_STYLE_NONE)
+-	options->base.hint_style = CAIRO_HINT_STYLE_NONE;
+-
+-    if (options->base.lcd_filter == CAIRO_LCD_FILTER_DEFAULT)
++    if (other->base.lcd_filter != CAIRO_LCD_FILTER_DEFAULT)
+ 	options->base.lcd_filter = other->base.lcd_filter;
+ 
+-    if (other->base.lcd_filter == CAIRO_LCD_FILTER_NONE)
+-	options->base.lcd_filter = CAIRO_LCD_FILTER_NONE;
+-
+     if (options->base.antialias == CAIRO_ANTIALIAS_NONE) {
+ 	if (options->base.hint_style == CAIRO_HINT_STYLE_NONE)
+ 	    load_flags |= FT_LOAD_NO_HINTING;

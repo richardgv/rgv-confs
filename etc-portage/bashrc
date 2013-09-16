@@ -1,0 +1,21 @@
+bashrc_call_epatch_user() {
+	[ -d ${S} ] && cd "${S}"
+	if type epatch_user > /dev/null 2>&1 \
+			&& type epatch > /dev/null 2>&1; then
+		epatch_user
+	else
+		. ${ROOT}etc/portage/env/epatch_user.sh
+		epatch_user
+		# To avoid issues when writing an ebuild
+		unset epatch
+		unset epatch_user
+	fi
+}
+
+post_src_unpack() {
+	[ -z "$LATE_EPATCH_USER" ] && bashrc_call_epatch_user
+}
+
+post_src_prepare() {
+	[ -n "$LATE_EPATCH_USER" ] && bashrc_call_epatch_user
+}

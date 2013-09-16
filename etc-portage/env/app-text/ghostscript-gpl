@@ -1,0 +1,3 @@
+if [ "${EBUILD_PHASE}" == "prepare" ]; then
+	sed -i 's/AM_PROG_CC_STDC//' "${S}/ijs/configure.ac" || die
+fi

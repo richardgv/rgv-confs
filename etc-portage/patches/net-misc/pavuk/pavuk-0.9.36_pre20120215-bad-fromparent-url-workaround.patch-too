@@ -1,0 +1,13 @@
+diff --git a/src/url.c b/src/url.c
+index 70cc90d..21b7fde 100644
+--- a/src/url.c
++++ b/src/url.c
+@@ -42,7 +42,7 @@ const protinfo prottable[] = {
+ #endif
+   {URLT_FILE,        NULL,    "file",    "file://",   0,                   TRUE},
+   {URLT_GOPHER,     "gopher", "gopher",  "gopher://", DEFAULT_GOPHER_PORT, TRUE},
+-  {URLT_FROMPARENT,  NULL,    "//",      "//",        DEFAULT_HTTP_PORT,   TRUE}
++  {URLT_FROMPARENT,  NULL,    "//",      "//",        DEFAULT_HTTP_PORT,   FALSE}
+ };
+ 
+ int prottable_size(void)

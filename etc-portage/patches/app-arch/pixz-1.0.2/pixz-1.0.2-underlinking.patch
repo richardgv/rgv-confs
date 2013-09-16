@@ -1,0 +1,13 @@
+diff --git a/Makefile~ b/Makefile
+index fe605f2..36dc27b 100644
+--- a/Makefile~
++++ b/Makefile
+@@ -12,7 +12,7 @@ MYCFLAGS = $(patsubst %,-I%/include,$(LIBPREFIX)) $(OPT) -std=gnu99 \
+ MYLDFLAGS = $(patsubst %,-L%/lib,$(LIBPREFIX)) $(OPT) -Wall
+ 
+ THREADS = -lpthread
+-LIBADD = $(THREADS) -llzma -larchive
++LIBADD = $(THREADS) -llzma -larchive -lm
+ 
+ CC = gcc
+ COMPILE = $(CC) $(MYCFLAGS) $(CFLAGS) -c -o

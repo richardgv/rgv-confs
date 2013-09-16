@@ -1,0 +1,3 @@
+# if [ "${EBUILD_PHASE}" == "prepare" ]; then
+# 	EPATCH_EXCLUDE="${EPATCH_EXCLUDE} cairo-libpng16.patch"
+# fi

@@ -1,0 +1,3 @@
+if [ "${EBUILD_PHASE}" == "prepare" ]; then
+	sed -i 's/#include "png.h"/#include <string.h>\n\0/' "${S}/apngasm.c" || die
+fi

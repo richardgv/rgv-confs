@@ -1,0 +1,20 @@
+--- src/htmlparser.c~	2013-04-28 12:42:52.569907543 +0800
++++ src/htmlparser.c	2013-04-28 12:43:43.119907178 +0800
+@@ -1991,7 +1991,7 @@
+         p += strspn(p, "\n\r");
+     }
+ 
+-    if (hpinfo->rewrite)
++    if (hpinfo->rewrite && stackc)
+     {
+         ilen = strlen(stackc);
+         hpinfo->stack_offset = 0;
+@@ -2150,7 +2150,7 @@
+         p += strspn(p, "\n\r");
+     }
+ 
+-    if (hpinfo->rewrite)
++    if (hpinfo->rewrite && stackc)
+     {
+         ilen = strlen(stackc);
+         hpinfo->stack_offset = 0;

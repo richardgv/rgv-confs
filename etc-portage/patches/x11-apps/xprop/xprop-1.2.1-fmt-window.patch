@@ -1,0 +1,19 @@
+--- xprop.c	2012-12-12 11:23:01.130637285 +0800
++++ xprop.new.c	2012-12-12 11:22:50.400636286 +0800
+@@ -1643,6 +1643,7 @@
+ 	nelements = textprop.nitems;
+ 	break;
+       }
++      case 'w':
+       case 'x':
+       case 'c': {
+ 	static unsigned char data8[MAXELEMENTS];
+@@ -1681,6 +1682,8 @@
+ 	}
+ 	
+ 	type = XA_CARDINAL;
++	if ('w' == format_char)
++		type = XA_WINDOW;
+ 	free(value2);
+ 	break;
+       }

@@ -1,0 +1,5 @@
+# post_src_install() {
+# 	# Install gtk-fallback.css
+# 	insinto "/usr/share/themes/Adwaita/gtk-3.0"
+# 	doins "${S}/themes/Adwaita/gtk-3.0/gtk-fallback.css"
+# }

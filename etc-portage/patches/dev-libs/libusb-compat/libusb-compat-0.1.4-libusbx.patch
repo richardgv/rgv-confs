@@ -1,0 +1,17 @@
+--- libusb/core.c~	2012-04-24 13:37:34.000000000 +0800
++++ libusb/core.c	2012-07-02 05:14:09.920156050 +0800
+@@ -32,12 +32,14 @@
+ static libusb_context *ctx = NULL;
+ static int usb_debug = 0;
+ 
++/*
+ enum usbi_log_level {
+ 	LOG_LEVEL_DEBUG,
+ 	LOG_LEVEL_INFO,
+ 	LOG_LEVEL_WARNING,
+ 	LOG_LEVEL_ERROR,
+ };
++*/
+ 
+ #ifdef ENABLE_LOGGING
+ #define _usbi_log(level, fmt...) usbi_log(level, __FUNCTION__, fmt)

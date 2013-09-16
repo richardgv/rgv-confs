@@ -1,0 +1,26 @@
+diff --git a/jovie-4.10.1-orig/CMakeLists.txt b/jovie-4.10.1/CMakeLists.txt
+index 2760a70..2d157af 100644
+--- a/jovie-4.10.1-orig/CMakeLists.txt
++++ b/jovie-4.10.1/CMakeLists.txt
+@@ -20,7 +20,7 @@ if (Q_WS_X11)
+   if (SPEECHD_FOUND)
+     configure_file (config-jovie.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-jovie.h )
+ 
+-    include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/libkttsd ${CMAKE_CURRENT_SOURCE_DIR}/libkttsd)
++    include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/libkttsd ${CMAKE_CURRENT_SOURCE_DIR}/libkttsd "${SPEECHD_INCLUDE_DIR}")
+ 
+     add_subdirectory( doc )
+     add_subdirectory( libkttsd )
+diff --git a/jovie-4.10.1-orig/cmake/FindSpeechd.cmake b/jovie-4.10.1/cmake/FindSpeechd.cmake
+index cf78d32..0902cdd 100644
+--- a/jovie-4.10.1-orig/cmake/FindSpeechd.cmake
++++ b/jovie-4.10.1/cmake/FindSpeechd.cmake
+@@ -9,7 +9,7 @@
+ # Redistribution and use is allowed according to the terms of the BSD license.
+ # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+ 
+-find_path(SPEECHD_INCLUDE_DIR libspeechd.h)
++find_path(SPEECHD_INCLUDE_DIR libspeechd.h PATH_SUFFIXES speech-dispatcher)
+ 
+ find_library(SPEECHD_LIBRARIES NAMES speechd)
+ 

@@ -1,0 +1,54 @@
+From d789322947a78bf3c7031686988ccc971aeff40e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Diego=20Elio=20Petten=C3=B2?= <flameeyes@gmail.com>
+Date: Wed, 24 Nov 2010 02:08:44 +0100
+Subject: [PATCH] Define the base version in version_table_ with an empty key.
+
+Binutils' own ld manual suggests to use the following syntax to define a
+symbol with a new version and a compatibility alternative without a
+version:
+
+     __asm__(".symver original_foo,foo@");
+     __asm__(".symver new_foo,foo@@VERS_2.0");
+
+but this syntax was not accepted by gold, because it wouldn't find the ""
+version in the table (it looks for whatever comes after the '@' character
+and before the NULL-termination).
+
+This actually allows to build fuse from GIT with gold without dirty hacks
+or ABI breakage.
+---
+ gold/dynobj.cc |   11 +++++++++--
+ 1 files changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/gold/dynobj.cc b/gold/dynobj.cc
+index d2ba8ae..954db3a 100644
+--- a/gold/dynobj.cc
++++ b/gold/dynobj.cc
+@@ -1394,8 +1394,7 @@ void
+ Versions::define_base_version(Stringpool* dynpool)
+ {
+   // If we do any versioning at all,  we always need a base version, so
+-  // define that first.  Nothing explicitly declares itself as part of base,
+-  // so it doesn't need to be in version_table_.
++  // define that first.
+   gold_assert(this->defs_.empty());
+   const char* name = parameters->options().soname();
+   if (name == NULL)
+@@ -1405,6 +1404,14 @@ Versions::define_base_version(Stringpool* dynpool)
+                               true, false, false, true);
+   this->defs_.push_back(vdbase);
+   this->needs_base_version_ = false;
++
++  // You can tie a symbol to the base version by declaring it as foo@, as
++  // stated by the GNU ld manual, so we add the version to the symbol table
++  // as an empty key.
++  Stringpool::Key version_key;
++  name = dynpool->add("", true, &version_key);
++  Key key(version_key, 0);
++  this->version_table_.insert(std::make_pair(key, vdbase));
+ }
+ 
+ // Return the dynamic object which a symbol refers to.
+-- 
+1.7.3.2
+

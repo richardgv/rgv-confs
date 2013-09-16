@@ -1,0 +1,67 @@
+
+# HG changeset patch
+# User Mike Hommey <mh+mozilla@glandium.org>
+# Date 1358324107 -3600
+# Node ID eb1363fb8a2da3e7dfd1f5b80e73cae0f03565f3
+# Parent  e3c728cb2119007e3ce1e94435ed1879c2d73226
+Bug 654087 - Don't error out on gold special treatment of PT_TLS segment memsize. r=nfroyd
+
+diff --git a/build/unix/elfhack/elf.cpp b/build/unix/elfhack/elf.cpp
+--- a/build/unix/elfhack/elf.cpp
++++ b/build/unix/elfhack/elf.cpp
+@@ -254,17 +254,25 @@ Elf::Elf(std::ifstream &file)
+         if (phdr.p_type == PT_PHDR)
+             segment->addSection(phdr_section);
+         for (int j = 1; j < ehdr->e_shnum; j++)
+             if (phdr.contains(sections[j]))
+                 segment->addSection(sections[j]);
+         // Make sure that our view of segments corresponds to the original
+         // ELF file.
+         assert(segment->getFileSize() == phdr.p_filesz);
+-        assert(segment->getMemSize() == phdr.p_memsz);
++        // gold makes TLS segments end on an aligned virtual address, even
++        // when the underlying section ends before that, while bfd ld
++        // doesn't. It's fine if we don't keep that alignment.
++        unsigned int memsize = segment->getMemSize();
++        if (phdr.p_type == PT_TLS && memsize != phdr.p_memsz) {
++            unsigned int align = segment->getAlign();
++            memsize = (memsize + align - 1) & ~(align - 1);
++        }
++        assert(memsize == phdr.p_memsz);
+         segments.push_back(segment);
+     }
+ 
+     new (&eh_entry) ElfLocation(ehdr->e_entry, this);
+ }
+ 
+ Elf::~Elf()
+ {
+diff --git a/build/unix/elfhack/test.c b/build/unix/elfhack/test.c
+--- a/build/unix/elfhack/test.c
++++ b/build/unix/elfhack/test.c
+@@ -117,18 +117,22 @@ static int ret = 1;
+ int print_status() {
+     fprintf(stderr, "%s\n", ret ? "FAIL" : "PASS");
+     return ret;
+ }
+ 
+ /* On ARM, this creates a .tbss section before .init_array, which
+  * elfhack could then pick instead of .init_array.
+  * Also, when .tbss is big enough, elfhack may wrongfully consider
+- * following sections as part of the PT_TLS segment. */
+-__thread int foo[1024];
++ * following sections as part of the PT_TLS segment.
++ * Finally, gold makes TLS segments end on an aligned virtual address,
++ * even when the underlying section ends before that, and elfhack
++ * sanity checks may yield an error. */
++__thread int foo;
++__thread long long int bar[512];
+ 
+ void end_test() {
+     static int count = 0;
+     /* Only exit when both constructors have been called */
+     if (++count == 2)
+         ret = 0;
+ }
+ 
+

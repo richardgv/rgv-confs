@@ -1,0 +1,11 @@
+--- Main/Main.make~	2012-11-12 16:34:49.360244809 +0800
++++ Main/Main.make	2012-11-12 16:44:44.380300021 +0800
+@@ -105,7 +105,7 @@
+ 
+ $(APPNAME): $(LIBS) $(OBJS)
+ 	@echo Linking $@
+-	$(CXX) -o $(APPNAME) $(LFLAGS) $(OBJS) $(LIBS) $(FUSE_LIBS) $(WX_LIBS)
++	$(CXX) -o $(APPNAME) $(LFLAGS) $(OBJS) $(LIBS) $(FUSE_LIBS) $(WX_LIBS) -ldl
+ 
+ ifeq "$(TC_BUILD_CONFIG)" "Release"
+ ifndef NOSTRIP

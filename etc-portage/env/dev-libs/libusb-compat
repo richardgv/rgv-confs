@@ -1,0 +1,3 @@
+if [ "${EBUILD_PHASE}" == "prepare" ]; then
+	sed -i -e 's/usbi_log_level/libusb_log_level/g' -e 's/LOG_LEVEL_/LIBUSB_LOG_LEVEL_/g' "${S}/libusb/core.c" || die
+fi

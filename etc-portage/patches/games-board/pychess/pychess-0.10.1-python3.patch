@@ -1,0 +1,63 @@
+tree adc0b76ca0c4
+parent f90cd19fee50
+author gbtami 1340301546 -7200
+committer gbtami 1340301546 -7200
+revision 2160
+branch default
+
+Fixed issue #661, PyChess hard-codes /usr/bin/python
+diff --git a/lib/pychess/Players/engineNest.py b/lib/pychess/Players/engineNest.py
+--- a/lib/pychess/Players/engineNest.py
++++ b/lib/pychess/Players/engineNest.py
+@@ -67,13 +67,15 @@
+ #    </vm>
+ #</engine>
+ 
++PYTHONBIN = sys.executable.split("/")[-1]
++
+ backup = """
+ <engines version="%s">
+     <engine protocol="cecp" protover="2" binname="PyChess.py">
+         <meta><country>dk</country></meta>
+-        <vm binname="python"><args><arg name='0' value="-u"/></args></vm></engine>
++        <vm binname="%s"><args><arg name='0' value="-u"/></args></vm></engine>
+     <engine protocol="cecp" protover="2" binname="shatranj.py">
+-        <vm binname="python"><args><arg name='0' value="-u"/></args></vm>
++        <vm binname="%s"><args><arg name='0' value="-u"/></args></vm>
+         <args><arg name='0' value='-xboard'/></args></engine>
+     <engine protocol="cecp" protover="2" binname="gnuchess">
+         <meta><country>us</country></meta>
+@@ -128,7 +130,7 @@
+         <meta><country>ru</country></meta>
+         <vm binname="wine"/></engine>
+ </engines>
+-""" % ENGINES_XML_API_VERSION
++""" % (ENGINES_XML_API_VERSION, PYTHONBIN, PYTHONBIN)
+ 
+ class EngineDiscoverer (GObject, PooledThread):
+     
+diff --git a/lib/pychess/widgets/newGameDialog.py b/lib/pychess/widgets/newGameDialog.py
+--- a/lib/pychess/widgets/newGameDialog.py
++++ b/lib/pychess/widgets/newGameDialog.py
+@@ -555,19 +555,13 @@
+         if bp.__type__ == LOCAL:
+             player0tup = (bp.__type__, bp.__class__, (WHITE, repr(wp)), repr(bp))
+         else:
+-            binname = bp.engine.path.split("/")[-1]
+-            if binname == "python":
+-                binname = bp.engine.args[1].split("/")[-1]
+-            xmlengine = discoverer.getEngines()[binname]
++            xmlengine = discoverer.getEngineByMd5(bp.md5)
+             player0tup = (ARTIFICIAL, discoverer.initPlayerEngine,
+                           (xmlengine, WHITE, bp.strength, gamemodel.variant,
+                            secs, gain), repr(bp))
+     else:
+         player0tup = (bp.__type__, bp.__class__, (WHITE, ""), repr(bp))
+-        binname = wp.engine.path.split("/")[-1]
+-        if binname == "python":
+-            binname = wp.engine.args[1].split("/")[-1]
+-        xmlengine = discoverer.getEngines()[binname]
++        xmlengine = discoverer.getEngineByMd5(wp.md5)
+         player1tup = (ARTIFICIAL, discoverer.initPlayerEngine,
+                       (xmlengine, BLACK, wp.strength, gamemodel.variant,
+                        secs, gain), repr(wp))
