@@ -1,0 +1,10 @@
+--- wibox.c~	2013-09-19 22:08:44.059965423 +0800
++++ wibox.c	2013-09-19 22:08:45.879965419 +0800
+@@ -607,6 +607,7 @@
+ {
+     if(wibox->visible)
+     {
++        xcb_clear_area(globalconf.connection, FALSE, wibox->window, 0, 0, 0, 0);
+         widget_render(wibox);
+         wibox_refresh_pixmap(wibox);
+ 
