@@ -8,8 +8,10 @@
 # x11-proto/xcb-proto -python_single_target_python2_7 python_single_target_python3_3
 =dev-lang/python-2* sqlite
 app-admin/eselect-php fpm
+app-arch/rar all_sfx
 app-arch/rpm python
 app-arch/snappy abi_x86_32
+app-benchmarks/sysbench aio
 app-crypt/heimdal -ssl
 app-doc/doxygen dot qt4
 app-editors/gvim python
@@ -19,7 +21,7 @@ app-emulation/virtualbox extensions qt4
 app-emulation/wine -udisks -oss xcomposite linguas_zh_CN linguas_zh_TW
 app-i18n/fcitx abi_x86_32 -autostart introspection qt4 opencc
 app-i18n/fcitx-configtool -gtk
-app-office/libreoffice -nsplugin java jemalloc webdav
+app-office/libreoffice -nsplugin java jemalloc webdav libreoffice_extensions_nlpsolver libreoffice_extensions_scripting-beanshell libreoffice_extensions_scripting-javascript  -python_single_target_python2_7 python_single_target_python3_3
 app-office/libreoffice-l10n linguas_zh_CN
 app-portage/gentoolkit -python_targets_python2_7
 app-portage/layman git mercurial subversion
@@ -40,7 +42,7 @@ dev-db/sqlite secure-delete unlock-notify
 dev-java/icedtea-bin -cjk nsplugin doc
 dev-java/oracle-jdk-bin nsplugin
 dev-java/swt webkit
-dev-lang/php curl fpm gd mysql mysqli mysqlnd -spell pdo threads tidy -cjk
+dev-lang/php curl fpm gd mysql mysqli mysqlnd -spell pcntl pdo threads tidy -cjk
 dev-lang/ruby threads
 dev-libs/DirectFB fbcon
 dev-libs/e_dbus -udev
@@ -56,6 +58,7 @@ dev-libs/libpcre pcre16
 dev-libs/libpthread-stubs abi_x86_32
 dev-libs/libsigc++ doc
 dev-libs/libxml2 icu
+dev-libs/libxslt python
 dev-qt/qt-creator cmake autotools fakevim git mercurial valgrind
 dev-qt/qtgui accessibility
 dev-qt/qttools accessibility
@@ -63,6 +66,8 @@ dev-qt/qtwidgets accessibility
 dev-util/apitrace qt4 egl
 dev-util/bugle abi_x86_32
 dev-util/cmake qt4
+dev-util/perf unwind
+dev-util/strace aio
 dev-vcs/git subversion tk
 dev-vcs/mercurial tk
 dev-vcs/subversion -dso perl
@@ -94,13 +99,14 @@ media-plugins/audacious-plugins cue
 media-video/ffmpeg opus theora
 media-video/mplayer v4l
 media-video/mpv v4l vcd
-media-video/vlc qt4
+media-video/vlc gme modplug qt4 musepack schroedinger speex switcher taglib theora v4l
 net-analyzer/nmap ncat ndiff nping
 net-analyzer/wireshark adns -gtk2 geoip
 net-dialup/ppp -gtk
 net-dns/unbound threads gost
 net-fs/cifs-utils upcall
 net-fs/samba client
+net-ftp/lftp convert-mozilla-cookies verify-file
 net-libs/ldns gost
 net-libs/loudmouth debug
 net-misc/openvpn down-root passwordsave
@@ -119,9 +125,10 @@ sys-libs/tdb python
 sys-libs/zlib minizip
 sys-process/lsof rpc
 virtual/ffmpeg theora
-www-client/firefox -minimal -pgo system-cairo
+www-client/firefox -minimal pgo system-cairo system-icu
 www-client/links directfb
 www-client/uget aria2
+www-plugins/adobe-flash -abi_x86_32
 www-servers/lighttpd mysql uploadprogress
 x11-apps/mesa-progs egl gles2
 x11-base/xorg-server dmx kdrive xvfb
@@ -172,4 +179,3 @@ x11-wm/fvwm gtk2-perl
 x11-wm/xmonad -default-term
 xfce-base/thunar -udev -xfce_plugins_trash
 xfce-base/xfce4-session -udev
-dev-libs/libxslt python

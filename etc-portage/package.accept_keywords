@@ -22,3 +22,5 @@ dev-lang/python:3.3 **
 =x11-wm/bspwm-9999 **
 # <media-libs/giflib-9999 **
 =app-text/goldendict-9999 **
+=app-i18n/librime-9999 **
+=app-i18n/fcitx-rime-9999 **

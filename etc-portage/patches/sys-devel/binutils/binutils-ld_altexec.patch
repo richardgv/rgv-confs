@@ -1,8 +1,8 @@
 diff --git a/ld/ld.texinfo b/ld/ld.texinfo
-index 6c74ff5..1830306 100644
+index 3919605..f520798 100644
 --- a/ld/ld.texinfo
 +++ b/ld/ld.texinfo
-@@ -2718,7 +2718,10 @@ You can change the behaviour of @command{ld} with the environment variables
+@@ -2726,7 +2726,10 @@ You can change the behaviour of @command{ld} with the environment variables
  @ifclear SingleFormat
  @code{GNUTARGET},
  @end ifclear
@@ -14,7 +14,7 @@ index 6c74ff5..1830306 100644
  
  @ifclear SingleFormat
  @kindex GNUTARGET
-@@ -2756,6 +2759,12 @@ a similar fashion by the @code{gcc} linker wrapper program.  The default
+@@ -2764,6 +2767,12 @@ a similar fashion by the @code{gcc} linker wrapper program.  The default
  may be overridden by the @samp{--demangle} and @samp{--no-demangle}
  options.
  
@@ -28,7 +28,7 @@ index 6c74ff5..1830306 100644
  @end ifset
  
 diff --git a/ld/ldmain.c b/ld/ldmain.c
-index b2810a7..8b5612f 100644
+index b10a8d7..b17ee23 100644
 --- a/ld/ldmain.c
 +++ b/ld/ldmain.c
 @@ -52,6 +52,7 @@
@@ -39,14 +39,18 @@ index b2810a7..8b5612f 100644
  
  #ifdef HAVE_SBRK
  #if !HAVE_DECL_SBRK
-@@ -173,12 +174,38 @@ ld_cleanup (void)
-     unlink_if_ordinary (output_filename);
+@@ -186,12 +187,42 @@ ld_bfd_assert_handler (const char *fmt, const char *bfdver,
+   config.make_executable = FALSE;
  }
  
 +static void
 +maybe_altexec(char **argv)
 +{
 +  char *LD_ALTEXEC;
++
++  /* If bfd is in path, return */
++  if (strcasestr(argv[0], "bfd"))
++    return;
 +
 +  /* If LD_ALTEXEC is not set or is empty, just return */
 +  LD_ALTEXEC = getenv("LD_ALTEXEC");
