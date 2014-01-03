@@ -27,11 +27,9 @@ index 3919605..f520798 100644
  @c man end
  @end ifset
  
-diff --git a/ld/ldmain.c b/ld/ldmain.c
-index b10a8d7..b17ee23 100644
---- a/ld/ldmain.c
-+++ b/ld/ldmain.c
-@@ -52,6 +52,7 @@
+--- binutils-2.24/ld/ldmain.c~	2014-01-03 20:27:02.089989770 +0800
++++ binutils-2.24/ld/ldmain.c	2014-01-03 20:27:04.429989765 +0800
+@@ -50,6 +50,7 @@
  #endif
  
  #include <string.h>
@@ -39,7 +37,7 @@ index b10a8d7..b17ee23 100644
  
  #ifdef HAVE_SBRK
  #if !HAVE_DECL_SBRK
-@@ -186,12 +187,42 @@ ld_bfd_assert_handler (const char *fmt, const char *bfdver,
+@@ -184,6 +185,34 @@
    config.make_executable = FALSE;
  }
  
@@ -74,8 +72,9 @@ index b10a8d7..b17ee23 100644
  int
  main (int argc, char **argv)
  {
-   char *emulation;
-   long start_time = get_run_time ();
+@@ -193,6 +222,8 @@
+   char *start_sbrk = (char *) sbrk (0);
+ #endif
  
 +  maybe_altexec(argv);
 +
