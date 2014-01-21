@@ -1,0 +1,67 @@
+From: Robert O'Callahan <robert@ocallahan.org>
+Bug 955889. Restore caching in EnsureKeywordsHash. r=mano
+
+diff --git a/toolkit/components/places/nsNavBookmarks.cpp b/toolkit/components/places/nsNavBookmarks.cpp
+--- a/toolkit/components/places/nsNavBookmarks.cpp
++++ b/toolkit/components/places/nsNavBookmarks.cpp
+@@ -204,16 +204,17 @@ nsNavBookmarks::nsNavBookmarks()
+   , mMenuRoot(0)
+   , mTagsRoot(0)
+   , mUnfiledRoot(0)
+   , mToolbarRoot(0)
+   , mCanNotify(false)
+   , mCacheObservers("bookmark-observers")
+   , mBatching(false)
+   , mBookmarkToKeywordHash(BOOKMARKS_TO_KEYWORDS_INITIAL_CACHE_SIZE)
++  , mBookmarkToKeywordHashInitialized(false)
+   , mRecentBookmarksCache(RECENT_BOOKMARKS_INITIAL_CACHE_SIZE)
+   , mUncachableBookmarks(RECENT_BOOKMARKS_INITIAL_CACHE_SIZE)
+ {
+   NS_ASSERTION(!gBookmarksService,
+                "Attempting to create two instances of the service!");
+   gBookmarksService = this;
+ }
+ 
+@@ -2623,16 +2624,21 @@ nsNavBookmarks::GetURIForKeyword(const n
+   NS_ENSURE_SUCCESS(rv, rv);
+ 
+   return NS_OK;
+ }
+ 
+ 
+ nsresult
+ nsNavBookmarks::EnsureKeywordsHash() {
++  if (mBookmarkToKeywordHashInitialized) {
++    return NS_OK;
++  }
++  mBookmarkToKeywordHashInitialized = true;
++
+   nsCOMPtr<mozIStorageStatement> stmt;
+   nsresult rv = mDB->MainConn()->CreateStatement(NS_LITERAL_CSTRING(
+     "SELECT b.id, k.keyword "
+     "FROM moz_bookmarks b "
+     "JOIN moz_keywords k ON k.id = b.keyword_id "
+   ), getter_AddRefs(stmt));
+   NS_ENSURE_SUCCESS(rv, rv);
+ 
+diff --git a/toolkit/components/places/nsNavBookmarks.h b/toolkit/components/places/nsNavBookmarks.h
+--- a/toolkit/components/places/nsNavBookmarks.h
++++ b/toolkit/components/places/nsNavBookmarks.h
+@@ -430,16 +430,17 @@ private:
+   bool mBatching;
+ 
+   /**
+    * Always call EnsureKeywordsHash() and check it for errors before actually
+    * using the hash.  Internal keyword methods are already doing that.
+    */
+   nsresult EnsureKeywordsHash();
+   nsDataHashtable<nsTrimInt64HashKey, nsString> mBookmarkToKeywordHash;
++  bool mBookmarkToKeywordHashInitialized;
+ 
+   /**
+    * This function must be called every time a bookmark is removed.
+    *
+    * @param aURI
+    *        Uri to test.
+    */
+   nsresult UpdateKeywordsHashForRemovedBookmark(int64_t aItemId);
