@@ -24,3 +24,4 @@ dev-lang/python:3.3 **
 =app-text/goldendict-9999 **
 =app-i18n/librime-9999 **
 =app-i18n/fcitx-rime-9999 **
+=dev-util/apitrace-9999 **

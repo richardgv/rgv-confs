@@ -1,12 +1,11 @@
 sys-devel/gcc:4.8
-# <dev-qt/qt-creator-9999
-=app-emulation/emul-linux-x86-xlibs-20130224-r1
 # <dev-lang/spidermonkey-9999
 =app-doc/devmanual-9999
-# =dev-lang/python-3.3.1-r1000
 # <x11-drivers/nvidia-drivers-9999
 sci-geosciences/googleearth
 <net-fs/samba-9999
+=dev-qt/qt-creator-3*
+<dev-libs/libgcrypt-9999
 
 # Michael Palimaka <kensington@gentoo.org> (19 Oct 2012)
 # New major release breaks almost all existing consumers.
@@ -50,4 +49,8 @@ sci-geosciences/googleearth
 virtual/perl-Carp
 virtual/perl-B-Debug
 =virtual/perl-File-Temp-0.230.100
+
+# Chí-Thanh Christopher Nguyễn <chithanh@gentoo.org> (10 Nov 2013)
+# Causes build failures, bug #492800
+=media-libs/mesa-10.0*
 

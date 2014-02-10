@@ -9,14 +9,3 @@
            if [ -n "$trader_result" ] ; then
                echo $trader_result
                exit_success
---- xdg-utils-1.1.0_rc1_p20130921/scripts/xdg-mime~	2013-09-21 22:56:50.000000000 +0800
-+++ xdg-utils-1.1.0_rc1_p20130921/scripts/xdg-mime	2013-11-06 20:18:38.339995814 +0800
-@@ -934,7 +934,7 @@
-     for x in `echo "$xdg_system_dirs" | sed 's/:/ /g'`; do
-        for prefix in "$XDG_MENU_PREFIX" ""; do
-           DEBUG 2 "Checking $x/applications/${prefix}defaults.list and $x/applications/${prefix}mimeinfo.cache"
--          trader_result=`grep "$MIME=" $x/applications/${prefix}defaults.list $x/applications/${prefix}mimeinfo.cache 2> /dev/null | cut -d '=' -f 2 | cut -d ';' -f 1`
-+          trader_result=`grep "$MIME=" $x/applications/${prefix}defaults.list $x/applications/${prefix}mimeinfo.cache 2> /dev/null | head -n1 | cut -d '=' -f 2 | cut -d ';' -f 1`
-           if [ -n "$trader_result" ] ; then
-               echo $trader_result
-               exit_success

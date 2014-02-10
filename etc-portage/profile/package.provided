@@ -1,5 +1,5 @@
 # media-fonts/corefonts-1-r6
 media-fonts/ttf-bitstream-vera-1.10-r3
-sys-power/upower-0.9.18
+# sys-power/upower-0.9.18
 sys-fs/udisks-2.0.91
-# media-libs/libpng-1.5.15-r15
+media-video/nvidia-settings-331.20

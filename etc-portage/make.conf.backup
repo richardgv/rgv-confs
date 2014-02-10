@@ -11,7 +11,7 @@ LD_ALTEXEC="/usr/bin/ld.gold"
 CHOST="x86_64-pc-linux-gnu"
 # These are the USE flags that were used in addition to what is provided by the
 # profile used for building.
-USE="mmx sse sse2 ssse3 sse4_1 sse4_2 avx mmxext smp hardened custom-cflags optimization optimized-qmake -pch pgo jit"
+USE="mmx sse sse2 ssse3 sse4_1 sse4_2 avx mmxext smp hardened optimization optimized-qmake -pch pgo jit"
 USE="${USE} -wifi -bluetooth -ipv6 vdpau vaapi nvidia -upnp"
 USE="${USE} gtk gtk3 -qt4 pcre zsh-completion vim-syntax -tiff system-sqlite system-jpeg -policykit fontconfig ffmpeg iproute2 gtkstyle xft icu cjk caps bluray libass rtmp threads"
 USE="${USE} -fortran -ldap -udisks -handbook"
@@ -20,7 +20,7 @@ INPUT_DEVICES="evdev"
 LINGUAS="en en_US"
 GRUB_PLATFORMS="efi-64 pc"
 PHP_INI_VERSION="development"
-RUBY_TARGETS="ruby19 ruby20"
+RUBY_TARGETS="ruby20 ruby21"
 PHP_TARGETS="php5-5"
 PYTHON_TARGETS="python2_7 python3_3"
 USE_PYTHON="2.7 3.3"
@@ -29,7 +29,7 @@ ABI_X86="32 64"
 ACCEPT_KEYWORDS="~amd64"
 ACCEPT_LICENSE="*"
 MAKEOPTS="-j9"
-FEATURES="userfetch userpriv usersandbox buildsyspkg"
+FEATURES="userfetch userpriv usersandbox buildsyspkg force-mirror"
 PORTAGE_COMPRESS="xz"
 
 source /var/lib/layman/make.conf
@@ -37,6 +37,5 @@ source /var/lib/layman/make.conf
 PORTDIR_OVERLAY="${PORTDIR_OVERLAY} /usr/local/portage/"
 
 # GENTOO_MIRRORS="http://mirrors.163.com/gentoo/ http://mirrors.sohu.com/gentoo/ http://mirrors.stuhome.net/gentoo/ http://mirrors.xmu.edu.cn/gentoo"
-
+# GENTOO_MIRRORS="http://mirrors.163.com/gentoo/ http://mirrors.sohu.com/gentoo/ http://mirrors.stuhome.net/gentoo/ http://mirrors.xmu.edu.cn/gentoo http://ftp.jaist.ac.jp/pub/Linux/Gentoo/ http://ftp.iij.ad.jp/pub/linux/gentoo/"
 SYNC="rsync://rsync.cn.gentoo.org/gentoo-portage"
-GENTOO_MIRRORS="http://mirrors.163.com/gentoo/ http://mirrors.sohu.com/gentoo/ http://mirrors.stuhome.net/gentoo/ http://mirrors.xmu.edu.cn/gentoo"

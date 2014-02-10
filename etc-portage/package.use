@@ -1,8 +1,6 @@
 # dev-libs/soprano -virtuoso
 # media-libs/freetype infinality
-# net-libs/libpcap ipv6
 # net-misc/openssh hpn
-# sys-auth/consolekit policykit
 # x11-libs/libxcb -python_single_target_python2_7 python_single_target_python3_3
 # x11-libs/xpyb -python_targets_python2_7 -python_targets_python3_2 -python_single_target_python2_7 python_single_target_python3_3
 # x11-proto/xcb-proto -python_single_target_python2_7 python_single_target_python3_3
@@ -10,18 +8,19 @@
 app-admin/eselect-php fpm
 app-arch/rar all_sfx
 app-arch/rpm python
-app-arch/snappy abi_x86_32
 app-benchmarks/sysbench aio
 app-crypt/heimdal -ssl
 app-doc/doxygen dot qt4
 app-editors/gvim python
 app-editors/vim python vim-pager
+app-emulation/emul-linux-x86-soundlibs -pulseaudio
 app-emulation/qemu fdt qemu_softmmu_targets_arm qemu_user_targets_arm
 app-emulation/virtualbox extensions qt4
-app-emulation/wine -udisks -oss xcomposite linguas_zh_CN linguas_zh_TW
+app-emulation/wine netapi -run-exes -udisks -oss xcomposite linguas_zh_CN linguas_zh_TW
 app-i18n/fcitx abi_x86_32 -autostart introspection qt4 opencc
 app-i18n/fcitx-configtool -gtk
-app-office/libreoffice -nsplugin java jemalloc webdav libreoffice_extensions_nlpsolver libreoffice_extensions_scripting-beanshell libreoffice_extensions_scripting-javascript  -python_single_target_python2_7 python_single_target_python3_3
+app-misc/freemind latex
+app-office/libreoffice -nsplugin gstreamer java jemalloc webdav libreoffice_extensions_nlpsolver libreoffice_extensions_scripting-beanshell libreoffice_extensions_scripting-javascript -python_single_target_python2_7 python_single_target_python3_3
 app-office/libreoffice-l10n linguas_zh_CN
 app-portage/gentoolkit -python_targets_python2_7
 app-portage/layman git mercurial subversion
@@ -33,9 +32,7 @@ app-text/poppler qt4
 app-text/tesseract linguas_zh_CN linguas_zh_TW osd
 app-text/texlive context luatex xetex linguas_zh
 app-text/texlive-core xetex
-dev-cpp/glibmm doc
 dev-cpp/glog gflags
-dev-cpp/gtkmm:3.0 doc
 dev-db/mariadb tcmalloc
 dev-db/mysql tcmalloc
 dev-db/sqlite secure-delete unlock-notify
@@ -47,6 +44,7 @@ dev-lang/ruby threads
 dev-libs/DirectFB fbcon
 dev-libs/e_dbus -udev
 dev-libs/ecore fbcon -xcb
+dev-libs/efl fbcon pixman -xcb
 dev-libs/elfutils static-libs
 dev-libs/geoip city
 dev-libs/keybinder python
@@ -55,15 +53,16 @@ dev-libs/libconfig examples
 dev-libs/libgcrypt -caps
 dev-libs/libmirage doc
 dev-libs/libpcre pcre16
-dev-libs/libpthread-stubs abi_x86_32
 dev-libs/libsigc++ doc
 dev-libs/libxml2 icu
 dev-libs/libxslt python
+dev-libs/nss utils
 dev-qt/qt-creator cmake autotools fakevim git mercurial valgrind
 dev-qt/qtgui accessibility
 dev-qt/qttools accessibility
+dev-qt/qtwebkit:5 gstreamer libxml2 qml webp widgets xslt
 dev-qt/qtwidgets accessibility
-dev-util/apitrace qt4 egl
+dev-util/apitrace android qt4 egl
 dev-util/bugle abi_x86_32
 dev-util/cmake qt4
 dev-util/perf unwind
@@ -72,60 +71,72 @@ dev-vcs/git subversion tk
 dev-vcs/mercurial tk
 dev-vcs/subversion -dso perl
 games-board/pychess gstreamer
+games-strategy/0ad editor
 gnome-base/gvfs udisks
 gnome-extra/gnome-games artworkextra
 gnome-extra/synapse -zeitgeist
 gnome-extra/zenity -webkit
 kde-base/kdelibs -upower
+kde-base/okular chm djvu ebook mobi tiff
+kde-base/systemsettings -gtk
 mail-client/mutt gpg imap pop sasl smime smtp
 media-gfx/assimp samples tools
 media-gfx/blender python_single_target_python3_3
 media-gfx/fbida -X imagemagick fbcon
 media-gfx/gimp tiff xpm
+media-gfx/graphicsmagick jpeg2k tiff webp wmf
 media-gfx/imagemagick hdri jbig jpeg2k openexr perl raw tiff webp
 media-gfx/inkscape -spell wmf
 media-gfx/pngcrush -system-libs
-media-libs/elementary fbcon -xcb
+media-gfx/qiv magic
+media-libs/elementary fbcon quicklaunch -xcb
 media-libs/evas fbcon -xcb
-media-libs/fontconfig abi_x86_32
 media-libs/fontconfig-infinality -nyx
-media-libs/freetype abi_x86_32
 media-libs/freetype adobe-cff utils
 media-libs/lcms python
-media-libs/libsdl abi_x86_32
 media-libs/mesa -classic g3dvl -opencl xorg gles1 gles2 gbm
-media-libs/opencv opencl threads v4l
+media-libs/opencv opencl threads qt4 testprograms v4l
+media-libs/phonon qt4
+media-libs/phonon-gstreamer qt4
 media-plugins/audacious-plugins cue
-media-video/ffmpeg opus theora
+media-video/ffmpeg network opus theora
 media-video/mplayer v4l
-media-video/mpv v4l vcd
-media-video/vlc gme modplug qt4 musepack schroedinger speex switcher taglib theora v4l
+media-video/mpv dvdnav v4l vcd
+media-video/vlc faad fdk gme modplug qt4 matroska musepack opencv schroedinger speex switcher taglib theora twolame v4l
 net-analyzer/nmap ncat ndiff nping
 net-analyzer/wireshark adns -gtk2 geoip
 net-dialup/ppp -gtk
 net-dns/unbound threads gost
-net-fs/cifs-utils upcall
+net-fs/cifs-utils ads
 net-fs/samba client
 net-ftp/lftp convert-mozilla-cookies verify-file
 net-libs/ldns gost
 net-libs/loudmouth debug
+net-misc/connman openvpn vpnc wifi
 net-misc/openvpn down-root passwordsave
 net-misc/pavuk debug
 net-misc/tigervnc server
+net-misc/youtube-dl offensive -python_single_target_python2_7 python_single_target_python3_3
 net-p2p/amule geoip
+net-wireless/wpa_supplicant ap wps
 sci-geosciences/googleearth -bundled-libs
 sys-apps/dbus doc
 sys-apps/portage python3
+sys-auth/consolekit policykit
 sys-block/gparted fat ntfs -gtk
-sys-devel/gcc -gtk graphite lto
+sys-devel/binutils multitarget
+sys-devel/gcc -gtk graphite lto mudflap
+sys-devel/gdb expat multitarget
 sys-devel/llvm clang gold
-sys-fs/eudev -rule-generator
+sys-devel/llvm udis86
+sys-fs/eudev hwdb keymap -rule-generator
 sys-libs/talloc python
 sys-libs/tdb python
 sys-libs/zlib minizip
 sys-process/lsof rpc
 virtual/ffmpeg theora
-www-client/firefox -minimal pgo system-cairo system-icu
+www-client/chromium aura
+www-client/firefox gstreamer -minimal pgo system-cairo system-icu
 www-client/links directfb
 www-client/uget aria2
 www-plugins/adobe-flash -abi_x86_32
@@ -133,48 +144,24 @@ www-servers/lighttpd mysql uploadprogress
 x11-apps/mesa-progs egl gles2
 x11-base/xorg-server dmx kdrive xvfb
 x11-libs/cairo xlib-xcb
-x11-libs/libICE abi_x86_32
-x11-libs/libSM abi_x86_32
-x11-libs/libX11 abi_x86_32 doc
-x11-libs/libXScrnSaver abi_x86_32
-x11-libs/libXau abi_x86_32
-x11-libs/libXaw abi_x86_32
-x11-libs/libXcomposite abi_x86_32
-x11-libs/libXcursor abi_x86_32
-x11-libs/libXdamage abi_x86_32
-x11-libs/libXdmcp abi_x86_32
-x11-libs/libXext abi_x86_32
-x11-libs/libXfixes abi_x86_32
-x11-libs/libXft abi_x86_32
-x11-libs/libXi abi_x86_32
-x11-libs/libXinerama abi_x86_32
-x11-libs/libXmu abi_x86_32
-x11-libs/libXp abi_x86_32
-x11-libs/libXpm abi_x86_32
-x11-libs/libXrandr abi_x86_32
-x11-libs/libXrender abi_x86_32
-x11-libs/libXt abi_x86_32
-x11-libs/libXtst abi_x86_32
-x11-libs/libXv abi_x86_32
-x11-libs/libXvMC abi_x86_32
-x11-libs/libXxf86dga abi_x86_32
-x11-libs/libXxf86vm abi_x86_32
+x11-libs/libX11 doc
 x11-libs/libdrm libkms
 x11-libs/libfm -udev vala
-x11-libs/libpciaccess abi_x86_32
-x11-libs/libvdpau abi_x86_32
+x11-libs/libvdpau doc
 x11-libs/libxcb doc abi_x86_32 xkb
 x11-libs/vte python
 x11-libs/wxGTK tiff
 x11-misc/shutter drawing
 x11-misc/tint2 examples tint2conf
-x11-proto/* abi_x86_32
+x11-plugins/cairo-dock-plugins ical gnome lm_sensors mail -upower vte xgamma
 x11-terms/gnome-terminal -nautilus
 x11-terms/rxvt-unicode 256-color
 x11-terms/st savedconfig
+x11-themes/qtcurve qt4
+x11-wm/bspwm examples
 x11-wm/compiz-fusion emerald
 x11-wm/dwm savedconfig
-x11-wm/enlightenment -udev xcomposite
+x11-wm/enlightenment xcomposite
 x11-wm/fvwm gtk2-perl
 x11-wm/xmonad -default-term
 xfce-base/thunar -udev -xfce_plugins_trash

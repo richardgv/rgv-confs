@@ -3,8 +3,5 @@ dev-vcs/gitstats::gentoo
 >=x11-wm/emerald-0.9::local_overlay
 dev-python/PyQt4::qt
 dev-python/sip::qt
-dev-qt/designer:5
 # =dev-lang/python-*_pre*::progress
-
-dev-util/mdds:0/0.9.0
 >=sys-boot/syslinux-5.00

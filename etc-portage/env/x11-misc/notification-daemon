@@ -1,0 +1,3 @@
+if [ "${EBUILD_PHASE}" == "prepare" ]; then
+	sed -i 's/\(#define[[:space:]][[:space:]]*MAX_NOTIFICATIONS[[:space:]][[:space:]]*\)20[[:space:]]*$/\150/' "${S}/src/daemon.c" || die
+fi
