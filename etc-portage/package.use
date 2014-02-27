@@ -82,7 +82,7 @@ kde-base/systemsettings -gtk
 mail-client/mutt gpg imap pop sasl smime smtp
 media-gfx/assimp samples tools
 media-gfx/blender python_single_target_python3_3
-media-gfx/fbida -X imagemagick fbcon
+media-gfx/fbida -X imagemagick fbcon tiff
 media-gfx/gimp tiff xpm
 media-gfx/graphicsmagick jpeg2k tiff webp wmf
 media-gfx/imagemagick hdri jbig jpeg2k openexr perl raw tiff webp
@@ -118,7 +118,7 @@ net-misc/pavuk debug
 net-misc/tigervnc server
 net-misc/youtube-dl offensive -python_single_target_python2_7 python_single_target_python3_3
 net-p2p/amule geoip
-net-wireless/wpa_supplicant ap wps
+net-wireless/wpa_supplicant ap eap-sim p2p wimax wps
 sci-geosciences/googleearth -bundled-libs
 sys-apps/dbus doc
 sys-apps/portage python3
@@ -142,7 +142,8 @@ www-client/uget aria2
 www-plugins/adobe-flash -abi_x86_32
 www-servers/lighttpd mysql uploadprogress
 x11-apps/mesa-progs egl gles2
-x11-base/xorg-server dmx kdrive xvfb
+x11-base/xorg-server dmx kdrive xvfb unwind
+x11-drivers/nvidia-drivers uvm
 x11-libs/cairo xlib-xcb
 x11-libs/libX11 doc
 x11-libs/libdrm libkms
@@ -157,6 +158,7 @@ x11-plugins/cairo-dock-plugins ical gnome lm_sensors mail -upower vte xgamma
 x11-terms/gnome-terminal -nautilus
 x11-terms/rxvt-unicode 256-color
 x11-terms/st savedconfig
+x11-themes/bespin kde windeco
 x11-themes/qtcurve qt4
 x11-wm/bspwm examples
 x11-wm/compiz-fusion emerald
