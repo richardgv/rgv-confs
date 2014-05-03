@@ -9,6 +9,7 @@ app-admin/eselect-php fpm
 app-arch/rar all_sfx
 app-arch/rpm python
 app-benchmarks/sysbench aio
+app-crypt/gcr vala
 app-crypt/heimdal -ssl
 app-doc/doxygen dot qt4
 app-editors/gvim python
@@ -20,6 +21,7 @@ app-emulation/wine netapi -run-exes -udisks -oss xcomposite linguas_zh_CN lingua
 app-i18n/fcitx abi_x86_32 -autostart introspection qt4 opencc
 app-i18n/fcitx-configtool -gtk
 app-misc/freemind latex
+app-misc/geoclue -modemmanager -networkmanager
 app-office/libreoffice -nsplugin gstreamer java jemalloc webdav libreoffice_extensions_nlpsolver libreoffice_extensions_scripting-beanshell libreoffice_extensions_scripting-javascript -python_single_target_python2_7 python_single_target_python3_3
 app-office/libreoffice-l10n linguas_zh_CN
 app-portage/gentoolkit -python_targets_python2_7
@@ -36,8 +38,10 @@ dev-cpp/glog gflags
 dev-db/mariadb tcmalloc
 dev-db/mysql tcmalloc
 dev-db/sqlite secure-delete unlock-notify
-dev-java/icedtea-bin -cjk nsplugin doc
-dev-java/oracle-jdk-bin nsplugin
+dev-db/unixODBC -minimal
+dev-dotnet/gnome-desktop-sharp gtksourceview rsvg wnck
+dev-java/icedtea-bin -cjk nsplugin
+dev-java/oracle-jdk-bin doc nsplugin
 dev-java/swt webkit
 dev-lang/php curl fpm gd mysql mysqli mysqlnd -spell pcntl pdo threads tidy -cjk
 dev-lang/ruby threads
@@ -57,17 +61,21 @@ dev-libs/libsigc++ doc
 dev-libs/libxml2 icu
 dev-libs/libxslt python
 dev-libs/nss utils
+dev-python/PyQt4 webkit
+dev-python/sphinx latex
 dev-qt/qt-creator cmake autotools fakevim git mercurial valgrind
 dev-qt/qtgui accessibility
 dev-qt/qttools accessibility
 dev-qt/qtwebkit:5 gstreamer libxml2 qml webp widgets xslt
 dev-qt/qtwidgets accessibility
 dev-util/apitrace android qt4 egl
-dev-util/bugle abi_x86_32
+dev-util/bugle -abi_x86_32
 dev-util/cmake qt4
+dev-util/glade python
+dev-util/ltrace unwind
 dev-util/perf unwind
 dev-util/strace aio
-dev-vcs/git subversion tk
+dev-vcs/git highlight subversion tk
 dev-vcs/mercurial tk
 dev-vcs/subversion -dso perl
 games-board/pychess gstreamer
@@ -81,7 +89,7 @@ kde-base/okular chm djvu ebook mobi tiff
 kde-base/systemsettings -gtk
 mail-client/mutt gpg imap pop sasl smime smtp
 media-gfx/assimp samples tools
-media-gfx/blender python_single_target_python3_3
+media-gfx/blender collada cycles fftw python_single_target_python3_3 tiff
 media-gfx/fbida -X imagemagick fbcon tiff
 media-gfx/gimp tiff xpm
 media-gfx/graphicsmagick jpeg2k tiff webp wmf
@@ -94,13 +102,13 @@ media-libs/evas fbcon -xcb
 media-libs/fontconfig-infinality -nyx
 media-libs/freetype adobe-cff utils
 media-libs/lcms python
-media-libs/mesa -classic g3dvl -opencl xorg gles1 gles2 gbm
-media-libs/opencv opencl threads qt4 testprograms v4l
+media-libs/mesa -classic -opencl openmax gles1 gles2 gbm xa xvmc
+media-libs/opencv doc opencl threads qt4 testprograms v4l
 media-libs/phonon qt4
 media-libs/phonon-gstreamer qt4
 media-plugins/audacious-plugins cue
-media-video/ffmpeg network opus theora
-media-video/mplayer v4l
+media-video/ffmpeg aacplus faac network opus theora vpx wavpack webp x265
+media-video/mplayer bidi v4l
 media-video/mpv dvdnav v4l vcd
 media-video/vlc faad fdk gme modplug qt4 matroska musepack opencv schroedinger speex switcher taglib theora twolame v4l
 net-analyzer/nmap ncat ndiff nping
@@ -115,13 +123,16 @@ net-libs/loudmouth debug
 net-misc/connman openvpn vpnc wifi
 net-misc/openvpn down-root passwordsave
 net-misc/pavuk debug
+net-misc/remmina freerdp
 net-misc/tigervnc server
 net-misc/youtube-dl offensive -python_single_target_python2_7 python_single_target_python3_3
 net-p2p/amule geoip
 net-wireless/wpa_supplicant ap eap-sim p2p wimax wps
 sci-geosciences/googleearth -bundled-libs
+sci-libs/hdf5 -threads
 sys-apps/dbus doc
 sys-apps/portage python3
+sys-apps/the_silver_searcher lzma
 sys-auth/consolekit policykit
 sys-block/gparted fat ntfs -gtk
 sys-devel/binutils multitarget
@@ -130,13 +141,15 @@ sys-devel/gdb expat multitarget
 sys-devel/llvm clang gold
 sys-devel/llvm udis86
 sys-fs/eudev hwdb keymap -rule-generator
+sys-libs/ntdb python
 sys-libs/talloc python
 sys-libs/tdb python
 sys-libs/zlib minizip
+sys-process/htop oom
 sys-process/lsof rpc
 virtual/ffmpeg theora
 www-client/chromium aura
-www-client/firefox gstreamer -minimal pgo system-cairo system-icu
+www-client/firefox -minimal -pgo
 www-client/links directfb
 www-client/uget aria2
 www-plugins/adobe-flash -abi_x86_32
@@ -155,7 +168,7 @@ x11-libs/wxGTK tiff
 x11-misc/shutter drawing
 x11-misc/tint2 examples tint2conf
 x11-plugins/cairo-dock-plugins ical gnome lm_sensors mail -upower vte xgamma
-x11-terms/gnome-terminal -nautilus
+x11-terms/gnome-terminal -nautilus -gnome-shell
 x11-terms/rxvt-unicode 256-color
 x11-terms/st savedconfig
 x11-themes/bespin kde windeco

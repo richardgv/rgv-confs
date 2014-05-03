@@ -5,3 +5,6 @@ dev-python/PyQt4::qt
 dev-python/sip::qt
 # =dev-lang/python-*_pre*::progress
 >=sys-boot/syslinux-5.00
+dev-lang/mono::dotnet
+=dev-dotnet/libgdiplus-2.10.9-r2::dotnet
+# =dev-java/oracle-jdk-bin-1.8.0.0
