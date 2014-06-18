@@ -26,3 +26,4 @@ dev-lang/python:3.3 **
 =app-i18n/fcitx-rime-9999 **
 =dev-util/apitrace-9999 **
 <sys-power/upower-9999 **
+# <media-libs/giflib-9999 **
