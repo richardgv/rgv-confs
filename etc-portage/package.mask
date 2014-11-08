@@ -4,8 +4,10 @@ dev-vcs/gitstats::gentoo
 dev-python/PyQt4::qt
 dev-python/sip::qt
 # =dev-lang/python-*_pre*::progress
->=sys-boot/syslinux-5.00
+# >=sys-boot/syslinux-5.00
 dev-lang/mono::dotnet
 =dev-dotnet/libgdiplus-2.10.9-r2::dotnet
 # =dev-java/oracle-jdk-bin-1.8.0.0
-=x11-drivers/nvidia-drivers-337.19
+=sys-boot/gnu-efi-3.0s::local_overlay
+>=x11-base/xorg-server-1.15.99
+www-plugins/chrome-binary-plugins:stable

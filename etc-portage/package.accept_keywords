@@ -27,3 +27,4 @@ dev-lang/python:3.3 **
 =dev-util/apitrace-9999 **
 <sys-power/upower-9999 **
 # <media-libs/giflib-9999 **
+=app-office/unoconv-99999999 **
