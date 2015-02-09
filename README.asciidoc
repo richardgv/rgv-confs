@@ -2,4 +2,4 @@ rgv-conf README
 ===============
 Richard Grenville
 
-My portage overlay and configuration. Primarily used for synchronization between my home and work computer. Patches and ebuilds are not guaranteed to work, and in fact many doesn't. Many of the ebuilds and patches are not written by me. Issue reports are welcomed.
+My portage configuration. (The overlay is in `richardgv/rgv-overlay` now.) Primarily used for synchronization between my home and work computer.
