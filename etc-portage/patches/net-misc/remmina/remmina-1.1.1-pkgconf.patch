@@ -1,0 +1,11 @@
+--- Remmina-1.1.1/cmake/FindFREERDP.cmake~	2014-10-10 20:25:23.000000000 +0800
++++ Remmina-1.1.1/cmake/FindFREERDP.cmake	2014-11-18 20:37:26.620037600 +0800
+@@ -18,7 +18,7 @@
+ # Boston, MA 02111-1307, USA.
+ 
+ find_package(PkgConfig)
+-pkg_check_modules(PC_FREERDP freerdp>=1.0)
++pkg_check_modules(PC_FREERDP "freerdp >= 1.0")
+ set(FREERDP_DEFINITIONS ${PC_FREERDP_CFLAGS_OTHER})
+ 
+ find_path(FREERDP_INCLUDE_DIR NAMES freerdp/freerdp.h

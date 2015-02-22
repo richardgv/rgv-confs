@@ -1,13 +1,25 @@
-dev-vcs/gitstats::gentoo
->=x11-wm/compiz-0.9::local_overlay
->=x11-wm/emerald-0.9::local_overlay
+# Prefer versions in Portage tree
+=dev-dotnet/libgdiplus-2.10.9-r2::dotnet
 dev-python/PyQt4::qt
 dev-python/sip::qt
-# =dev-lang/python-*_pre*::progress
-# >=sys-boot/syslinux-5.00
-dev-lang/mono::dotnet
-=dev-dotnet/libgdiplus-2.10.9-r2::dotnet
-# =dev-java/oracle-jdk-bin-1.8.0.0
-=sys-boot/gnu-efi-3.0s::local_overlay
->=x11-base/xorg-server-1.15.99
+
+# Breaks net-misc/remmina-1.1.1
+=net-misc/freerdp-1.2.0_beta1_pre20141115
+
+# Never, ever, pull systemd in
+sys-apps/systemd
+
+# We use the beta slot
 www-plugins/chrome-binary-plugins:stable
+
+# Waiting for configuration file from Arch Linux...
+=sys-kernel/gentoo-sources-3.19.0
+
+# Very few packages support Ruby 2.2 right now
+=dev-lang/ruby-2.2.0-r1
+dev-lang/ruby:2.0
+virtual/rubygems:ruby22
+
+# C++ rewritten Compiz and emerald are not stable enough
+>=x11-wm/compiz-0.9::rgv-overlay
+>=x11-wm/emerald-0.9::rgv-overlay

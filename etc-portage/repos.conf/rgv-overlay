@@ -1,0 +1,6 @@
+[rgv-overlay]
+location = /usr/local/portage
+sync-type = git
+sync-depth = 0
+sync-uri = https://github.com/richardgv/rgv-overlay.git
+auto-sync = no

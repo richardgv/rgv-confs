@@ -1,16 +1,15 @@
 # dev-libs/soprano -virtuoso
 # media-libs/freetype infinality
 # net-misc/openssh hpn
-# x11-libs/libxcb -python_single_target_python2_7 python_single_target_python3_3
-# x11-libs/xpyb -python_targets_python2_7 -python_targets_python3_2 -python_single_target_python2_7 python_single_target_python3_3
-# x11-proto/xcb-proto -python_single_target_python2_7 python_single_target_python3_3
 app-admin/eselect-php fpm
+app-admin/syslog-ng json
 app-arch/rar all_sfx
 app-arch/rpm python
 app-benchmarks/sysbench aio
 app-crypt/gcr vala
 app-crypt/heimdal -ssl
-app-doc/doxygen dot qt4
+app-crypt/qca qt4
+app-doc/doxygen clang dot doxysearch qt4
 app-editors/gvim python
 app-editors/vim python vim-pager
 app-emulation/emul-linux-x86-soundlibs -pulseaudio
@@ -25,7 +24,6 @@ app-office/libreoffice -nsplugin gstreamer java jemalloc webdav libreoffice_exte
 app-office/libreoffice-l10n linguas_zh_CN
 app-office/lyx enchant
 app-office/unoconv -python_single_target_python2_7 python_single_target_python3_4
-app-portage/gentoolkit -python_targets_python2_7
 app-portage/layman git mercurial subversion
 app-shells/dash libedit
 app-text/asciidoc highlight
@@ -66,6 +64,7 @@ dev-libs/libxml2 icu
 dev-libs/libxslt python
 dev-libs/nss utils
 dev-python/PyQt4 webkit
+dev-python/ipython matplotlib
 dev-python/pexpect doc examples
 dev-python/sphinx latex
 dev-qt/qt-creator clang cmake autotools fakevim git mercurial valgrind
@@ -95,8 +94,7 @@ kde-base/okular chm djvu ebook mobi tiff
 kde-base/systemsettings -gtk
 mail-client/mutt gpg imap pop sasl smime smtp
 media-gfx/assimp samples tools
-media-gfx/blender collada cycles fftw python_single_target_python3_3 tiff
-media-gfx/blender python_single_target_python3_4
+media-gfx/blender collada cycles fftw python_single_target_python3_4 tiff
 media-gfx/exiv2 xmp
 media-gfx/fbida -X imagemagick fbcon tiff
 media-gfx/gimp tiff xpm
@@ -112,7 +110,7 @@ media-libs/evas fbcon -xcb
 media-libs/fontconfig-infinality -nyx
 media-libs/freetype adobe-cff utils
 media-libs/lcms python
-media-libs/mesa -classic dri3 -opencl openmax gles1 gles2 gbm xa xvmc
+media-libs/mesa classic dri3 -opencl openmax gles1 gles2 gbm xa xvmc
 media-libs/opencv doc opencl threads qt4 testprograms v4l
 media-libs/phonon qt4
 media-libs/phonon-gstreamer qt4
@@ -120,7 +118,8 @@ media-libs/phonon-vlc qt4
 media-plugins/audacious-plugins cue
 media-video/ffmpeg aacplus faac network opus theora vpx wavpack webp x265
 media-video/mplayer bidi v4l
-media-video/mpv dvdnav postproc v4l vcd
+media-video/mpv dvdnav lua postproc v4l vcd vf-dlopen
+media-video/smplayer qt4
 media-video/vlc faad fdk gme modplug qt4 matroska musepack opencv schroedinger speex switcher taglib theora twolame v4l
 net-analyzer/nmap ncat ndiff nping
 net-analyzer/rrdtool graph
@@ -139,14 +138,14 @@ net-misc/openvpn down-root passwordsave
 net-misc/pavuk debug
 net-misc/remmina freerdp
 net-misc/tigervnc server
-net-misc/youtube-dl offensive -python_single_target_python2_7 python_single_target_python3_3
+net-misc/youtube-dl offensive -python_single_target_python2_7 python_single_target_python3_4
 net-p2p/amule geoip
 net-print/cups -usb
 net-wireless/wpa_supplicant ap eap-sim p2p wimax wps
 sci-geosciences/googleearth -bundled-libs
 sci-libs/hdf5 -threads
 sys-apps/dbus doc
-sys-apps/portage python3
+sys-apps/portage cvs git ipc subversion
 sys-apps/the_silver_searcher lzma
 sys-auth/consolekit policykit
 sys-block/gparted fat ntfs -gtk
@@ -170,10 +169,11 @@ www-client/uget aria2
 www-plugins/adobe-flash -abi_x86_32
 www-servers/lighttpd mysql uploadprogress
 x11-apps/mesa-progs gles2
-x11-base/xorg-server dmx kdrive xvfb unwind
+x11-base/xorg-server dmx xvfb unwind kdrive xephyr
 x11-drivers/nvidia-drivers uvm
 x11-drivers/xf86-video-intel uxa
 x11-libs/cairo xlib-xcb
+x11-libs/gtk+:3 examples
 x11-libs/libX11 doc
 x11-libs/libdrm libkms
 x11-libs/libfm -udev vala
@@ -194,6 +194,7 @@ x11-wm/compiz-fusion emerald
 x11-wm/dwm savedconfig
 x11-wm/enlightenment xcomposite
 x11-wm/fvwm gtk2-perl
+x11-wm/mutter -kms
 x11-wm/xmonad -default-term
 xfce-base/thunar -udev -xfce_plugins_trash
 xfce-base/xfce4-session -udev
