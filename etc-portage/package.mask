@@ -1,25 +1,20 @@
-# Prefer versions in Portage tree
-=dev-dotnet/libgdiplus-2.10.9-r2::dotnet
-dev-python/PyQt4::qt
-dev-python/sip::qt
-
-# Breaks net-misc/remmina-1.1.1
-=net-misc/freerdp-1.2.0_beta1_pre20141115
-
 # Never, ever, pull systemd in
 sys-apps/systemd
 
 # We use the beta slot
 www-plugins/chrome-binary-plugins:stable
 
-# Waiting for configuration file from Arch Linux...
-=sys-kernel/gentoo-sources-3.19.0
-
-# Very few packages support Ruby 2.2 right now
-=dev-lang/ruby-2.2.0-r1
-dev-lang/ruby:2.0
-virtual/rubygems:ruby22
-
 # C++ rewritten Compiz and emerald are not stable enough
 >=x11-wm/compiz-0.9::rgv-overlay
 >=x11-wm/emerald-0.9::rgv-overlay
+
+# Not enough packages support dev-lang/ruby:2.3
+=dev-lang/ruby-2.3.0
+=dev-lang/ruby-2.3.1
+
+# Waiting for the configuration file from Arch Linux
+>=sys-kernel/gentoo-sources-4.5.0
+
+# dev-libs/boost-1.60.0: Waiting for more tests
+#=dev-libs/boost-1.60.0
+#=dev-util/boost-build-1.60.0

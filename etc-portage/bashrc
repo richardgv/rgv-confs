@@ -1,5 +1,10 @@
 bashrc_call_epatch_user() {
 	[ -d ${S} ] && cd "${S}"
+
+	# If eapply_user has been executed, do not execute epatch_user again
+	[ -f "${T}/.portage_user_patches_applied" ] && return 0
+
+	# Execute epatch_user
 	if type epatch_user > /dev/null 2>&1 \
 			&& type epatch > /dev/null 2>&1; then
 		epatch_user
@@ -10,6 +15,9 @@ bashrc_call_epatch_user() {
 		unset epatch
 		unset epatch_user
 	fi
+
+	# Prevent eapply_user from being executed
+	>> "${T}/.portage_user_patches_applied"
 }
 
 post_src_unpack() {

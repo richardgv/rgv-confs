@@ -1,6 +1,6 @@
---- wine-1.7.0/dlls/gdi32/freetype.c~	2013-08-03 02:09:56.000000000 +0800
-+++ wine-1.7.0/dlls/gdi32/freetype.c	2013-09-20 20:24:25.770082226 +0800
-@@ -3833,8 +3833,6 @@
+--- wine-1.9.9/dlls/gdi32/freetype.c~	2016-04-30 00:04:00.000000000 +0800
++++ wine-1.9.9/dlls/gdi32/freetype.c	2016-05-15 11:42:17.320142986 +0800
+@@ -4025,8 +4025,6 @@
  
              if (!RegCreateKeyA( HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows NT\\CurrentVersion\\FontSubstitutes", &hkey ))
              {

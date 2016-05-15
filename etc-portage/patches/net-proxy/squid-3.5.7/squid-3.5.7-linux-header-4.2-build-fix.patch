@@ -1,0 +1,28 @@
+--- squid-3.5.7/compat/os/linux.h~	2015-09-12 16:09:50.269937698 +0800
++++ squid-3.5.7/compat/os/linux.h	2015-09-12 16:10:00.609937677 +0800
+@@ -30,6 +30,25 @@
+ #endif
+ 
+ /*
++ * Netfilter header madness. (Bug 4323)
++ *
++ * Netfilter have a history of defining their own versions of network protocol
++ * primitives without sufficient protection against the POSIX defines which are
++ * aways present in Linux.
++ *
++ * This problem affects many Linux 2.x (with the IPv6 primitives) and has
++ * reappeared in Linux 4.2 with IPv4 primitives during the iptables -> nft
++ * tool changes.
++ *
++ * The kernel maintainers added hacks to workaround it, but that will only work
++ * if netinet/in.h is included before the first time linux/libc-compat.h is
++ * included.
++ */
++#if LINUX_NETFILTER
++#include <netinet/in.h>
++#endif
++
++/*
+  * sys/capability.h is only needed in Linux apparently.
+  *
+  * HACK: LIBCAP_BROKEN Ugly glue to get around linux header madness colliding with glibc

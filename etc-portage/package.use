@@ -1,13 +1,10 @@
-# dev-libs/soprano -virtuoso
-# media-libs/freetype infinality
-# net-misc/openssh hpn
-app-admin/eselect-php fpm
 app-admin/syslog-ng json
 app-arch/rar all_sfx
 app-arch/rpm python
 app-benchmarks/sysbench aio
 app-crypt/gcr vala
-app-crypt/heimdal -ssl
+app-crypt/heimdal -ssl -threads
+app-crypt/pinentry gnome-keyring
 app-crypt/qca qt4
 app-doc/doxygen clang dot doxysearch qt4
 app-editors/gvim python
@@ -15,34 +12,37 @@ app-editors/vim python vim-pager
 app-emulation/emul-linux-x86-soundlibs -pulseaudio
 app-emulation/qemu fdt numa qemu_softmmu_targets_arm qemu_user_targets_arm
 app-emulation/virtualbox extensions qt4
-app-emulation/wine -netapi -run-exes -udisks -oss xcomposite linguas_zh_CN linguas_zh_TW
-app-i18n/fcitx abi_x86_32 -autostart introspection qt4 opencc
+app-emulation/wine -netapi -run-exes -udisks -oss -vaapi xcomposite linguas_zh_CN linguas_zh_TW
+app-eselect/eselect-php fpm
+app-i18n/fcitx abi_x86_32 -autostart gtk2 gtk3 introspection qt4 opencc
 app-i18n/fcitx-configtool -gtk
 app-misc/freemind latex
 app-misc/geoclue -modemmanager -networkmanager
+app-office/akonadi-server qt4
 app-office/libreoffice -nsplugin gstreamer java jemalloc webdav libreoffice_extensions_nlpsolver libreoffice_extensions_scripting-beanshell libreoffice_extensions_scripting-javascript -python_single_target_python2_7 python_single_target_python3_4
 app-office/libreoffice-l10n linguas_zh_CN
 app-office/lyx enchant
 app-office/unoconv -python_single_target_python2_7 python_single_target_python3_4
+app-pda/libimobiledevice -python_targets_python3_4
 app-portage/layman git mercurial subversion
 app-shells/dash libedit
 app-text/asciidoc highlight
 app-text/evince djvu
 app-text/goldendict kde
 app-text/poppler qt4
-app-text/tesseract linguas_zh_CN linguas_zh_TW osd
+app-text/tesseract linguas_zh_CN linguas_zh_TW -opencl osd
 app-text/texlive context luatex xetex linguas_zh
 app-text/texlive-core xetex
 dev-cpp/glog gflags
-dev-db/mariadb -xml
-dev-db/mariadb tcmalloc
+dev-db/mariadb client-libs tcmalloc -xml
 dev-db/mysql tcmalloc
 dev-db/sqlite secure-delete unlock-notify
 dev-db/unixODBC -minimal
 dev-dotnet/gnome-desktop-sharp gtksourceview rsvg wnck
-dev-java/icedtea-bin -cjk nsplugin
-dev-java/oracle-jdk-bin doc nsplugin
+dev-java/icedtea-bin -cjk
+dev-java/oracle-jdk-bin doc javafx nsplugin
 dev-java/swt webkit
+dev-lang/mono sgen
 dev-lang/php curl fpm gd mysql mysqli mysqlnd -spell pcntl pdo threads tidy -cjk
 dev-lang/python sqlite
 dev-lang/ruby threads
@@ -55,20 +55,26 @@ dev-libs/geoip city
 dev-libs/keybinder python
 dev-libs/libattica qt4
 dev-libs/libconfig examples
-dev-libs/libdbusmenu-qt qt4
+dev-libs/libdbusmenu-qt qt4 qt5
 dev-libs/libgcrypt -caps
+dev-libs/libgdata gnome
 dev-libs/libmirage doc
 dev-libs/libpcre pcre16
 dev-libs/libsigc++ doc
 dev-libs/libxml2 icu
 dev-libs/libxslt python
 dev-libs/nss utils
+dev-libs/quazip qt4
 dev-python/PyQt4 webkit
 dev-python/ipython matplotlib
 dev-python/pexpect doc examples
 dev-python/sphinx latex
-dev-qt/qt-creator clang cmake autotools fakevim git mercurial valgrind
+dev-qt/assistant webkit
+dev-qt/qt-creator cmake autotools fakevim git mercurial valgrind
 dev-qt/qtgui accessibility
+dev-qt/qtlockedfile qt4
+dev-qt/qtsingleapplication qt4
+dev-qt/qtsql mysql
 dev-qt/qttools accessibility
 dev-qt/qtwebkit:5 gstreamer libxml2 qml webp widgets xslt
 dev-qt/qtwidgets accessibility
@@ -79,21 +85,23 @@ dev-util/codeblocks contrib
 dev-util/glade python
 dev-util/ltrace unwind
 dev-util/perf unwind
-dev-util/strace aio
+dev-util/strace aio unwind
 dev-vcs/git highlight subversion tk
 dev-vcs/mercurial tk
 dev-vcs/subversion -dso perl
 games-board/pychess gstreamer
 games-strategy/0ad editor
-gnome-base/gvfs udisks
+gnome-base/gvfs archive -google gphoto2 ios mtp nfs samba udisks
 gnome-extra/gnome-games artworkextra
 gnome-extra/synapse -zeitgeist
 gnome-extra/zenity -webkit
+kde-apps/okular chm djvu ebook mobi tiff
 kde-base/kdelibs -upower
-kde-base/okular chm djvu ebook mobi tiff
 kde-base/systemsettings -gtk
+kde-misc/kdiff3 qt4
 mail-client/mutt gpg imap pop sasl smime smtp
-media-gfx/assimp samples tools
+media-fonts/source-han-sans -cjk
+media-fonts/source-han-sans linguas_zh_CN linguas_zh_TW
 media-gfx/blender collada cycles fftw python_single_target_python3_4 tiff
 media-gfx/exiv2 xmp
 media-gfx/fbida -X imagemagick fbcon tiff
@@ -103,6 +111,7 @@ media-gfx/imagemagick hdri jbig jpeg2k openexr perl raw tiff webp
 media-gfx/inkscape -spell wmf
 media-gfx/pngcrush -system-libs
 media-gfx/qiv magic
+media-libs/assimp samples tools
 media-libs/clutter egl
 media-libs/cogl gles2
 media-libs/elementary fbcon quicklaunch -xcb
@@ -110,18 +119,21 @@ media-libs/evas fbcon -xcb
 media-libs/fontconfig-infinality -nyx
 media-libs/freetype adobe-cff utils
 media-libs/lcms python
-media-libs/mesa classic dri3 -opencl openmax gles1 gles2 gbm xa xvmc
+media-libs/libvpx postproc
+media-libs/mesa classic dri3 openmax gles1 gles2 gbm xa xvmc
 media-libs/opencv doc opencl threads qt4 testprograms v4l
-media-libs/phonon qt4
+media-libs/phonon qt4 qt5
 media-libs/phonon-gstreamer qt4
-media-libs/phonon-vlc qt4
-media-plugins/audacious-plugins cue
-media-video/ffmpeg aacplus faac network opus theora vpx wavpack webp x265
+media-libs/phonon-vlc qt4 qt5
+media-libs/waffle egl
+media-plugins/audacious-plugins cue -gtk
+media-sound/audacious -gtk
+media-video/ffmpeg aacplus faac fdk network opus theora vpx wavpack webp x265
 media-video/mplayer bidi v4l
 media-video/mpv dvdnav lua postproc v4l vcd vf-dlopen
 media-video/smplayer qt4
-media-video/vlc faad fdk gme modplug qt4 matroska musepack opencv schroedinger speex switcher taglib theora twolame v4l
-net-analyzer/nmap ncat ndiff nping
+media-video/vlc faad fdk gme libsamplerate matroska modplug musepack opencv opus postproc qt4 rtsp schroedinger speex switcher taglib theora twolame v4l vpx x265
+net-analyzer/nmap ncat ndiff nping zenmap
 net-analyzer/rrdtool graph
 net-analyzer/wireshark adns -gtk2 geoip
 net-dialup/ppp -gtk
@@ -132,8 +144,9 @@ net-ftp/lftp convert-mozilla-cookies verify-file
 net-im/skype apulse -pulseaudio
 net-libs/ldns gost
 net-libs/loudmouth debug
-net-misc/aria2 tcmalloc
+net-misc/aria2 adns bittorrent metalink
 net-misc/connman openvpn vpnc wifi
+net-misc/iputils clockdiff tracepath
 net-misc/openvpn down-root passwordsave
 net-misc/pavuk debug
 net-misc/remmina freerdp
@@ -141,19 +154,20 @@ net-misc/tigervnc server
 net-misc/youtube-dl offensive -python_single_target_python2_7 python_single_target_python3_4
 net-p2p/amule geoip
 net-print/cups -usb
-net-wireless/wpa_supplicant ap eap-sim p2p wimax wps
+net-wireless/wpa_supplicant ap eap-sim p2p wps
 sci-geosciences/googleearth -bundled-libs
 sci-libs/hdf5 -threads
 sys-apps/dbus doc
 sys-apps/portage cvs git ipc subversion
 sys-apps/the_silver_searcher lzma
-sys-auth/consolekit policykit
+sys-auth/consolekit cgroups policykit
 sys-block/gparted fat ntfs -gtk
 sys-devel/binutils multitarget
-sys-devel/gcc -gtk graphite lto mudflap
+sys-devel/gcc graphite -jit
 sys-devel/gdb expat multitarget
-sys-devel/llvm clang gold libedit
+sys-devel/llvm clang gold libedit lldb
 sys-fs/eudev hwdb keymap -rule-generator
+sys-kernel/gentoo-sources experimental
 sys-libs/ntdb python
 sys-libs/talloc python
 sys-libs/tdb python
@@ -162,17 +176,16 @@ sys-libs/zlib minizip
 sys-process/htop oom
 sys-process/lsof rpc
 virtual/ffmpeg theora
-www-client/chromium aura
-www-client/firefox gstreamer -minimal -pgo system-icu system-jpeg system-sqlite
+www-client/chromium proprietary-codecs
+www-client/firefox gstreamer pgo
 www-client/links directfb
 www-client/uget aria2
 www-plugins/adobe-flash -abi_x86_32
 www-servers/lighttpd mysql uploadprogress
 x11-apps/mesa-progs gles2
 x11-base/xorg-server dmx xvfb unwind kdrive xephyr
-x11-drivers/nvidia-drivers uvm
+x11-drivers/nvidia-drivers uvm static-libs tools
 x11-drivers/xf86-video-intel uxa
-x11-libs/cairo xlib-xcb
 x11-libs/gtk+:3 examples
 x11-libs/libX11 doc
 x11-libs/libdrm libkms
